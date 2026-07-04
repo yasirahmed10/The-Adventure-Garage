@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+*.env.local
+backend/venv_312_new/
+jaffa.db
+
+# Node
+node_modules/
+dist/
+.next/
+.nuxt/
+.cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Uploads (keep structure, ignore content)
+uploads/**/*
+!uploads/.gitkeep
+!uploads/images/.gitkeep
+!uploads/videos/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Docker
+*.override.yml
