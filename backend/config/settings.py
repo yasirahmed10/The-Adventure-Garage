@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Database
-    DATABASE_URL: str = "postgresql://jaffa_user:jaffa_pass@localhost:5432/jaffa_db"
+    DATABASE_URL: str = "sqlite:///./jaffa.db"
 
     # CORS
     CORS_ORIGINS: str = '["http://localhost:3000","http://localhost:5173"]'
