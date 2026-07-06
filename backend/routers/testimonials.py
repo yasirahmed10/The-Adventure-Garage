@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from backend.database.db import get_db
 from backend.models.testimonial import Testimonial, TestimonialStatus
@@ -11,10 +11,10 @@ router = APIRouter(prefix="/testimonials", tags=["Testimonials"])
 
 
 @router.get("/", response_model=List[TestimonialResponse])
-def get_approved_testimonials(food_id: int = None, is_featured: bool = None, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+def get_approved_testimonials(service_id: Optional[int] = None, is_featured: bool = None, skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     query = db.query(Testimonial).filter(Testimonial.status == TestimonialStatus.approved)
-    if food_id:
-        query = query.filter(Testimonial.food_id == food_id)
+    if service_id:
+        query = query.filter(Testimonial.service_id == service_id)
     if is_featured is not None:
         query = query.filter(Testimonial.is_featured == is_featured)
     return query.order_by(Testimonial.created_at.desc()).offset(skip).limit(limit).all()

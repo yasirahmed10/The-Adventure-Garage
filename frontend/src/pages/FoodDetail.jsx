@@ -1,185 +1,268 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, Clock, Minus, Plus, ShoppingBag, ShieldAlert, Heart, Share2 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { Shield, Check, HelpCircle, ChevronDown, Calendar, Phone, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import api from '../services/api';
 
-const FoodDetail = () => {
-  const { slug } = useParams();
-  const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(0);
+const BeforeAfterSlider = ({ before, after }) => {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
 
-  // Mock data fetching based on slug
-  const food = {
-    id: parseInt(slug) || 1,
-    name: "Mughlai Chicken Shawarma",
-    description: "Rich, creamy Mughlai spices infused in juicy chicken shawarma wrap with fries. Made with tender chicken, garlic mayo, and traditional spices.",
-    price: 160,
-    discount_percent: 0,
-    rating: 4.9,
-    rating_count: 85,
-    preparation_time: 15,
-    ingredients: "Charcoal chicken, Mughlai cream sauce, Garlic Toum, Pickled cucumber, Crispy fries",
-    allergens: "Dairy, Gluten",
-    nutrition_info: { calories: 650, protein: "32g", carbs: "48g", fat: "22g" },
-    is_available: true,
-    type: "non_veg",
-    spice_level: "medium",
-    images: [
-      "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1642686333215-de0f6990bf9b?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1529003600303-bd51f3c83707?w=800&auto=format&fit=crop"
-    ]
-  };
-
-  const actualPrice = food.price * (1 - food.discount_percent / 100);
-
-  const handleAddToCart = () => {
-    addToCart(food, quantity);
-    // Add toast notification here
+  const handleMove = (clientX) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPosition(position);
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8">
-      <Helmet>
-        <title>{food.name} | Jaffa</title>
-        <meta name="description" content={food.description} />
-      </Helmet>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Breadcrumb */}
-        <nav className="flex text-sm text-gray-500 mb-8">
-          <Link to="/" className="hover:text-primary-500">Home</Link>
-          <span className="mx-2">/</span>
-          <Link to="/menu" className="hover:text-primary-500">Menu</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900 font-medium">{food.name}</span>
-        </nav>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            
-            {/* Image Gallery */}
-            <div className="p-6 bg-gray-50">
-              <div className="relative rounded-xl overflow-hidden aspect-square mb-4 bg-white border border-gray-200">
-                <img src={food.images[activeImage]} alt={food.name} className="w-full h-full object-cover" />
-                {food.discount_percent > 0 && (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-md">
-                    {food.discount_percent}% OFF
-                  </div>
-                )}
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm flex items-center">
-                  <Star className="w-4 h-4 text-yellow-400 mr-1 fill-yellow-400" />
-                  <span className="font-bold">{food.rating}</span>
-                  <span className="text-gray-500 text-xs ml-1">({food.rating_count})</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-4 gap-4">
-                {food.images.map((img, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => setActiveImage(idx)}
-                    className={`rounded-lg overflow-hidden border-2 aspect-square ${activeImage === idx ? 'border-primary-500 ring-2 ring-primary-200' : 'border-transparent hover:border-gray-300'} transition-all`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Product Details */}
-            <div className="p-8 lg:p-12 flex flex-col justify-center">
-              
-              <div className="flex justify-between items-start mb-4">
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{food.name}</h1>
-                <div className="flex space-x-2">
-                  <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition"><Heart className="w-6 h-6" /></button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-full transition"><Share2 className="w-6 h-6" /></button>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="flex items-center text-sm font-medium">
-                  {food.type === 'veg' ? (
-                    <span className="flex items-center text-green-700 bg-green-50 px-2 py-1 rounded border border-green-200">
-                      <div className="w-3 h-3 bg-green-600 rounded-full mr-2"></div> Vegetarian
-                    </span>
-                  ) : (
-                    <span className="flex items-center text-red-700 bg-red-50 px-2 py-1 rounded border border-red-200">
-                      <div className="w-3 h-3 bg-red-600 transform rotate-45 mr-2"></div> Non-Veg
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Clock className="w-4 h-4 mr-1 text-gray-400" /> {food.preparation_time} mins prep
-                </div>
-              </div>
-
-              <div className="mb-8">
-                <div className="flex items-end">
-                  <span className="text-4xl font-bold text-primary-600">₹{actualPrice.toFixed(2)}</span>
-                  {food.discount_percent > 0 && (
-                    <span className="ml-3 text-lg text-gray-400 line-through mb-1">₹{food.price.toFixed(2)}</span>
-                  )}
-                </div>
-              </div>
-
-              <p className="text-gray-600 mb-8 leading-relaxed text-lg">
-                {food.description}
-              </p>
-
-              <div className="border-t border-b border-gray-100 py-6 mb-8">
-                <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                  
-                  {/* Quantity */}
-                  <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white w-fit">
-                    <button 
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-3 text-gray-600 hover:text-primary-500 hover:bg-gray-50 rounded-l-xl transition"
-                    >
-                      <Minus className="w-5 h-5" />
-                    </button>
-                    <span className="w-12 text-center font-bold text-lg">{quantity}</span>
-                    <button 
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="p-3 text-gray-600 hover:text-primary-500 hover:bg-gray-50 rounded-r-xl transition"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  {/* Add to Cart */}
-                  <button 
-                    onClick={handleAddToCart}
-                    disabled={!food.is_available}
-                    className={`flex-1 flex items-center justify-center py-3.5 px-6 rounded-xl text-lg font-bold transition-all shadow-lg ${food.is_available ? 'bg-primary-500 text-white hover:bg-primary-600 hover:shadow-xl shadow-primary-500/30' : 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'}`}
-                  >
-                    <ShoppingBag className="w-5 h-5 mr-2" />
-                    {food.is_available ? 'Add to Cart' : 'Currently Unavailable'}
-                  </button>
-
-                </div>
-              </div>
-
-              {/* Info Tags */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1 flex items-center">Ingredients</h4>
-                  <p className="text-gray-600">{food.ingredients}</p>
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1 flex items-center"><ShieldAlert className="w-4 h-4 mr-1 text-yellow-500" /> Allergens</h4>
-                  <p className="text-gray-600">{food.allergens || "None listed"}</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
+    <div 
+      ref={containerRef}
+      className="relative w-full h-[300px] md:h-[400px] rounded-3xl overflow-hidden shadow-xl border border-white/10 select-none cursor-ew-resize"
+      onMouseMove={(e) => isDragging && handleMove(e.clientX)}
+      onMouseDown={() => setIsDragging(true)}
+      onMouseUp={() => setIsDragging(false)}
+      onMouseLeave={() => setIsDragging(false)}
+      onTouchMove={(e) => e.touches.length > 0 && handleMove(e.touches[0].clientX)}
+      onTouchStart={() => setIsDragging(true)}
+      onTouchEnd={() => setIsDragging(false)}
+    >
+      <div className="absolute inset-0">
+        <img src={before} alt="Before" className="w-full h-full object-cover" />
+        <div className="absolute top-4 left-4 bg-black/70 px-3 py-1 rounded-full text-xs font-bold text-red-500 uppercase tracking-wider">Before</div>
       </div>
+      <div className="absolute inset-0" style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}>
+        <img src={after} alt="After" className="w-full h-full object-cover" />
+        <div className="absolute top-4 right-4 bg-black/70 px-3 py-1 rounded-full text-xs font-bold text-accent uppercase tracking-wider">After TAG Finish</div>
+      </div>
+      <div className="absolute top-0 bottom-0 w-1 bg-accent cursor-ew-resize z-30" style={{ left: `${sliderPosition}%` }}>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-accent rounded-full flex items-center justify-center shadow-lg border-2 border-black">
+          <svg className="w-4 h-4 text-black fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const FAQItem = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-white/5 py-4">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-left py-2 font-bold text-white hover:text-accent transition-colors"
+      >
+        <span className="text-sm md:text-base">{question}</span>
+        <ChevronDown className={`w-4 h-4 text-accent transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {isOpen && (
+        <p className="text-xs md:text-sm text-gray-400 mt-2 leading-relaxed pb-2">
+          {answer}
+        </p>
+      )}
+    </div>
+  );
+};
+
+const FoodDetail = () => {
+  const { slug } = useParams();
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const defaultDetails = {
+    "ceramic-coating": {
+      name: "Ceramic Coating",
+      description: "Our Ceramic Coating service utilizes advanced nano-quartz technology to establish a semi-permanent bond with the clear coat of your vehicle. This glass-like shell shields your vehicle against oxidation, acid etching, bird droppings, and UV fading while adding a brilliant candy-like gloss.",
+      cover_image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1200&auto=format&fit=crop",
+      price: 18000,
+      benefits: [
+        "Certified 9H glass hardness scratch shield",
+        "Deep reflectivity and candy gloss enhancement",
+        "Hydrophobic layer makes washing simple and quick",
+        "3-Year & 5-Year packages available with official warranties"
+      ],
+      faqs: [
+        { question: "How long does Ceramic Coating last?", answer: "Depending on the coating variant chosen, it will provide protection and gloss for 2 to 5 years with regular check-ups." },
+        { question: "Can a ceramic coating prevent stone chips?", answer: "No. Ceramic coatings only shield against fine swirls and chemical oxidation. For complete protection against gravel impact, consider our TPU Paint Protection Film." }
+      ],
+      before_img: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=800&auto=format&fit=crop",
+      after_img: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop"
+    },
+    "paint-protection-film-ppf": {
+      name: "Paint Protection Film (PPF)",
+      description: "Paint Protection Film (PPF) is an elite thermoplastic polyurethane (TPU) layer applied directly to your car's exterior. It features advanced self-healing capabilities that make light swirls and key scratches disappear under direct solar warmth or warm water.",
+      cover_image: "https://images.unsplash.com/photo-1507136566006-cfc505b114fc?q=80&w=1200&auto=format&fit=crop",
+      price: 65000,
+      benefits: [
+        "Microscopic self-healing coating cures minor scratches",
+        "Protects against sandblast, flying gravel, and key impacts",
+        "Optical transparency enhances depth without paint color shifts",
+        "10-Year warranty certificate against yellowing or peeling"
+      ],
+      faqs: [
+        { question: "Is PPF worth the investment?", answer: "Yes, PPF is the absolute highest level of protection available for automotive paint, preserving factory clear coat and increasing vehicle resale value." },
+        { question: "Can you wrap matte painted cars?", answer: "Yes! We offer specialized Matte PPF that protects matte surfaces or transforms gloss paint into a sleek satin finish." }
+      ],
+      before_img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop",
+      after_img: "https://images.unsplash.com/photo-1611245785530-ab08a8a47de4?q=80&w=800&auto=format&fit=crop"
+    }
+  };
+
+  useEffect(() => {
+    const fetchServiceDetail = async () => {
+      try {
+        const res = await api.get(`/services/${slug}`);
+        setService(res.data);
+      } catch (err) {
+        console.error("Error fetching detail, loading fallback:", err);
+        // Fallback matching slug key
+        const fallback = defaultDetails[slug] || defaultDetails["ceramic-coating"];
+        setService(fallback);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServiceDetail();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="bg-black min-h-screen py-24 flex items-center justify-center text-gray-500">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-accent"></div>
+      </div>
+    );
+  }
+
+  if (!service) {
+    return (
+      <div className="bg-black min-h-screen py-24 flex flex-col items-center justify-center text-gray-400 px-4">
+        <AlertTriangle className="w-16 h-16 text-red-500 mb-4 animate-bounce" />
+        <h2 className="text-2xl font-black text-white uppercase tracking-wider mb-2">Service Not Found</h2>
+        <p className="text-sm text-gray-500 mb-6">The requested detailing service page could not be located.</p>
+        <Link to="/services" className="bg-accent text-black font-bold px-6 py-2.5 rounded-full uppercase tracking-wider text-xs">
+          Back to Services
+        </Link>
+      </div>
+    );
+  }
+
+  // Fallbacks for before/after comparison
+  const beforeImage = service.before_img || "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=800&auto=format&fit=crop";
+  const afterImage = service.after_img || service.cover_image || "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop";
+
+  return (
+    <div className="bg-black min-h-screen text-gray-300">
+      <Helmet>
+        <title>{`${service.name} | TAG Detailing Studio`}</title>
+        <meta name="description" content={service.short_description || service.description} />
+      </Helmet>
+
+      {/* Hero Banner */}
+      <section className="relative h-[40vh] md:h-[50vh] w-full flex items-end">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
+          <img src={service.cover_image} alt={service.name} className="w-full h-full object-cover" />
+        </div>
+        
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-10">
+          <Link to="/services" className="inline-flex items-center text-xs font-bold text-accent uppercase tracking-widest hover:underline mb-4">
+            <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to Services
+          </Link>
+          <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight">{service.name}</h1>
+        </div>
+      </section>
+
+      {/* Detail Content */}
+      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          {/* Main Info */}
+          <div className="lg:col-span-2 space-y-12">
+            
+            {/* Description */}
+            <div className="space-y-4">
+              <h2 className="text-xl md:text-2xl font-extrabold text-white uppercase tracking-wide">About the Service</h2>
+              <p className="leading-relaxed text-gray-400 text-sm md:text-base">{service.description}</p>
+            </div>
+
+            {/* Benefits Checklist */}
+            {service.benefits && service.benefits.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-xl md:text-2xl font-extrabold text-white uppercase tracking-wide">Key Benefits</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {service.benefits.map((benefit, idx) => (
+                    <div key={idx} className="flex items-start space-x-3 p-4 rounded-2xl bg-white/5 border border-white/5">
+                      <div className="bg-accent/10 p-1.5 rounded-full text-accent flex-shrink-0 mt-0.5 border border-accent/20">
+                        <Check className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs md:text-sm text-gray-300 leading-normal">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Before & After Slider */}
+            <div className="space-y-6">
+              <h2 className="text-xl md:text-2xl font-extrabold text-white uppercase tracking-wide">Before & After Showcase</h2>
+              <BeforeAfterSlider before={beforeImage} after={afterImage} />
+            </div>
+
+          </div>
+
+          {/* Sidebar CTA & FAQs */}
+          <div className="space-y-8">
+            
+            {/* Pricing & Booking Card */}
+            <div className="glass-panel border-white/5 p-8 rounded-3xl space-y-6">
+              <div>
+                <span className="text-xs text-gray-500 block">Estimated Cost Starts</span>
+                <span className="text-2xl md:text-3xl font-black text-accent block mt-1">
+                  {service.price ? `₹${service.price.toLocaleString()}` : "Custom Quote"}
+                </span>
+                <p className="text-[10px] text-gray-500 mt-2 leading-relaxed">
+                  *Actual pricing varies based on vehicle segments (Hatchback, Sedan, SUV, Luxury) and paint condition.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-4 border-t border-white/5">
+                <Link 
+                  to={`/book-appointment?service=${encodeURIComponent(service.name)}`}
+                  className="w-full bg-accent text-black font-extrabold py-3.5 rounded-full text-xs tracking-wider uppercase text-center block hover:bg-accent-hover transition duration-300"
+                >
+                  Book Appointment
+                </Link>
+                <a 
+                  href="tel:09560815118"
+                  className="w-full border border-white/10 text-white font-extrabold py-3.5 rounded-full text-xs tracking-wider uppercase text-center block hover:bg-white/5 transition duration-300"
+                >
+                  Call detailing Experts
+                </a>
+              </div>
+            </div>
+
+            {/* FAQs */}
+            {service.faqs && service.faqs.length > 0 && (
+              <div className="glass-panel border-white/5 p-8 rounded-3xl">
+                <h3 className="font-extrabold text-white uppercase tracking-wider text-sm mb-6 flex items-center">
+                  <HelpCircle className="w-5 h-5 mr-2 text-accent" /> FAQs
+                </h3>
+                <div className="space-y-2">
+                  {service.faqs.map((faq, idx) => (
+                    <FAQItem key={idx} question={faq.question} answer={faq.answer} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+
+        </div>
+      </section>
     </div>
   );
 };

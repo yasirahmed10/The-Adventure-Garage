@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from backend.database.db import get_db
 from backend.models.gallery import Gallery
@@ -11,22 +11,19 @@ router = APIRouter(prefix="/gallery", tags=["Gallery"])
 
 
 @router.get("/", response_model=List[GalleryResponse])
-def get_gallery(active_only: bool = True, album: str = None, db: Session = Depends(get_db)):
+def get_gallery(active_only: bool = True, category: Optional[str] = None, db: Session = Depends(get_db)):
     query = db.query(Gallery)
     if active_only:
         query = query.filter(Gallery.is_active == True)
-    if album:
-        query = query.filter(Gallery.album == album)
-    return query.order_by(Gallery.display_order).all()
+    if category:
+        query = query.filter(Gallery.category == category)
+    return query.order_by(Gallery.display_order.asc()).all()
 
 
 @router.post("/", response_model=GalleryResponse)
-def create_gallery_item(item: GalleryCreate, file_url: str, thumbnail_url: str = None, media_type: str = "image", db: Session = Depends(get_db), admin=Depends(get_current_admin)):
+def create_gallery_item(item: GalleryCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     new_item = Gallery(
-        **item.model_dump(),
-        file_url=file_url,
-        thumbnail_url=thumbnail_url,
-        media_type=media_type
+        **item.model_dump()
     )
     db.add(new_item)
     db.commit()

@@ -6,7 +6,8 @@ from pydantic import BaseModel
 class GalleryCreate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    album: Optional[str] = None
+    file_url: str
+    category: Optional[str] = None # Cars, SUV, 4x4, PPF, Wrap, Ceramic, Thar
     is_featured: bool = False
     display_order: int = 0
     is_active: bool = True
@@ -15,7 +16,8 @@ class GalleryCreate(BaseModel):
 class GalleryUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
-    album: Optional[str] = None
+    file_url: Optional[str] = None
+    category: Optional[str] = None
     is_featured: Optional[bool] = None
     display_order: Optional[int] = None
     is_active: Optional[bool] = None
@@ -28,7 +30,7 @@ class GalleryResponse(BaseModel):
     media_type: str
     file_url: str
     thumbnail_url: Optional[str]
-    album: Optional[str]
+    category: Optional[str]
     is_featured: bool
     display_order: int
     is_active: bool

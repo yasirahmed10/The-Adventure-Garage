@@ -1,210 +1,707 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectFade, Navigation, Pagination } from 'swiper/modules';
+import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
+import { Shield, Sparkles, Paintbrush, Hammer, ChevronRight, Star, ChevronDown, CheckCircle2, Award, Zap, ShieldCheck, Clock, Phone, Globe, Settings, Wrench, BadgeIndianRupee, Users, ThumbsUp, Car } from 'lucide-react';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
-import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Star, Clock, Truck, ShieldCheck, MapPin } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+import api from '../services/api';
+
+// Custom CountUp hook/component for statistics
+const CounterItem = ({ value, label }) => {
+  const [count, setCount] = useState(0);
+  const [ref, setRef] = useState(null);
+  const target = parseInt(value.replace(/\D/g, ''));
+
+  useEffect(() => {
+    if (!ref) return;
+
+    let observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        let start = 0;
+        const duration = 2000; // 2 seconds
+        const stepTime = Math.abs(Math.floor(duration / target));
+        
+        const timer = setInterval(() => {
+          start += 1;
+          setCount(start);
+          if (start >= target) {
+            clearInterval(timer);
+            setCount(target);
+          }
+        }, Math.max(stepTime, 15));
+
+        observer.disconnect();
+      }
+    }, { threshold: 0.1 });
+
+    observer.observe(ref);
+    return () => observer.disconnect();
+  }, [ref, target]);
+
+  return (
+    <div ref={setRef} className="text-center p-6 glass-panel rounded-2xl border-white/5 relative overflow-hidden group">
+      <div className="absolute -top-10 -right-10 w-24 h-24 bg-accent/5 rounded-full blur-xl group-hover:bg-accent/15 transition-all duration-500" />
+      <span className="text-4xl md:text-5xl font-black text-accent block mb-2">
+        {count}{value.includes('+') ? '+' : ''}{value.includes('★') ? '★' : ''}
+      </span>
+      <span className="text-xs uppercase tracking-widest text-gray-400 block font-semibold">{label}</span>
+    </div>
+  );
+};
+
+// Before & After comparison slider
+const BeforeAfterSlider = () => {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
+
+  const handleMove = (clientX) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    setSliderPosition(position);
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length > 0) {
+      handleMove(e.touches[0].clientX);
+    }
+  };
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full max-w-4xl h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-white/10 select-none cursor-ew-resize"
+      onMouseMove={(e) => isDragging && handleMove(e.clientX)}
+      onTouchMove={handleTouchMove}
+      onMouseDown={() => setIsDragging(true)}
+      onMouseUp={() => setIsDragging(false)}
+      onMouseLeave={() => setIsDragging(false)}
+      onTouchStart={() => setIsDragging(true)}
+      onTouchEnd={() => setIsDragging(false)}
+    >
+      {/* Before Image */}
+      <div className="absolute inset-0">
+        <img 
+          src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=1200&auto=format&fit=crop" 
+          alt="Before detailing" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-bold text-red-500 uppercase tracking-widest border border-red-500/30">
+          Dirty / Scratched
+        </div>
+      </div>
+
+      {/* After Image (Clipped) */}
+      <div 
+        className="absolute inset-0"
+        style={{ clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)` }}
+      >
+        <img 
+          src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1200&auto=format&fit=crop" 
+          alt="After detailing" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-bold text-accent uppercase tracking-widest border border-accent/30">
+          TAG Mirror Finish
+        </div>
+      </div>
+
+      {/* Slider Line & Handle */}
+      <div 
+        className="absolute top-0 bottom-0 w-1 bg-accent cursor-ew-resize z-30"
+        style={{ left: `${sliderPosition}%` }}
+      >
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-accent rounded-full flex items-center justify-center shadow-lg border-2 border-black z-40">
+          <svg className="w-6 h-6 text-black fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// FAQ Accordion Item
+const FAQItem = ({ question, answer }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-white/5 py-4">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-left py-2 font-bold text-base md:text-lg text-white hover:text-accent transition-colors"
+      >
+        <span>{question}</span>
+        <ChevronDown className={`w-5 h-5 text-accent transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <p className="text-sm md:text-base text-gray-400 mt-2 leading-relaxed pb-4">
+              {answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const Home = () => {
-  // Mock data for initial render
-  const heroSlides = [
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHomeSettings = async () => {
+      try {
+        const response = await api.get('/settings/design');
+        setSettings(response.data);
+      } catch (err) {
+        console.error("Failed to fetch design settings:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHomeSettings();
+  }, []);
+
+  const heroVideo = "https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c054273f1d237197b5f14e7a2b97063a&profile_id=139&oauth2_token_id=57447761";
+
+  const brandLogos = [
+    { name: "Toyota", icon: "/images/toyota.png" },
+    { name: "Mahindra", icon: "/images/mahindra.png" },
+    { name: "Jeep", icon: "/images/jeep.png" },
+    { name: "Ford", icon: "/images/ford.png" },
+    { name: "Mercedes", icon: "/images/mercedes.png" },
+    { name: "BMW", icon: "/images/bmw.png" },
+    { name: "Audi", icon: "/images/audi.png" },
+    { name: "Tata", icon: "/images/tata.png" }
+  ];
+
+  const services = [
     {
-      id: 1,
-      image: "/images/shawarma_wrap.png",
-      title: "Authentic Lebanese Shawarmas",
-      subtitle: "Experience the true taste of slow-roasted chicken wrapped in warm, freshly-baked pita bread.",
-      buttonText: "Order Now",
-      buttonLink: "/menu"
+      title: "Ceramic Coating",
+      desc: "Durable ceramic coating enhancing gloss while shielding from UV, dirt, and scratches.",
+      icon: <Sparkles className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/ceramic_coating.png"
     },
     {
-      id: 2,
-      image: "/images/chicken_rice_bowl.png",
-      title: "Premium Spiced Rice Bowls",
-      subtitle: "Fragrant basmati rice bowls topped with roasted chicken shawarma and our signature garlic sauce.",
-      buttonText: "View Menu",
-      buttonLink: "/menu"
+      title: "Paint Protection Film (PPF)",
+      desc: "Premium self-healing TPU film protecting from chips, scratches, and daily wear.",
+      icon: <Shield className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/ppf.png"
+    },
+    {
+      title: "Vehicle Wrapping",
+      desc: "Premium vinyl wraps in hundreds of colors, matte, gloss, and carbon fiber finishes.",
+      icon: <Paintbrush className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/vehicle_wrapping.png"
+    },
+    {
+      title: "Premium Detailing",
+      desc: "Professional detailing packages designed to restore your vehicle to showroom condition.",
+      icon: <Star className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/premium_detailing.png"
+    },
+    {
+      title: "Premium Body Kits",
+      desc: "Upgrade appearance with custom front lips, diffusers, spoilers, and wide body kits.",
+      icon: <Wrench className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/premium_body_kits.png"
+    },
+    {
+      title: "4x4 Modifications",
+      desc: "Complete off-road packages: lift kits, bumpers, winches, and massive off-road alloys.",
+      icon: <Hammer className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/offroad_modifications.png"
+    },
+    {
+      title: "Custom Wraps",
+      desc: "Personalized graphics, racing stripes, camouflage, and custom-designed liveries.",
+      icon: <Paintbrush className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/custom_wraps.png"
+    },
+    {
+      title: "Ambient Lighting",
+      desc: "Premium multi-color interior ambient lighting with smartphone app control.",
+      icon: <Zap className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/ambient_lighting.png"
+    },
+    {
+      title: "OBD Digital Meters",
+      desc: "Real-time performance displays for RPM, turbo boost, temps, and fuel economy.",
+      icon: <Settings className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/obd_digital_meters.png"
+    },
+    {
+      title: "Custom Thar Tail Lights",
+      desc: "Stylish aftermarket LED sequential and dynamic tail lights specially for Mahindra Thar.",
+      icon: <CheckCircle2 className="w-8 h-8 text-accent" />,
+      link: "/services",
+      img: "/images/services/thar_tail_lights.png"
     }
   ];
 
-  const categories = [
-    { id: 1, name: "Shawarmas", image: "/images/shawarma_wrap.png" },
-    { id: 2, name: "Open Platters", image: "/images/shawarma_platter.png" },
-    { id: 3, name: "Rice Bowls", image: "/images/chicken_rice_bowl.png" },
-    { id: 8, name: "Turkish Baklava", image: "/images/turkish_baklava.png" },
+  const whyChooseUs = [
+    { title: "Certified Detailing Professionals", desc: "Our detailers and technicians are globally certified and highly experienced.", icon: <Award className="w-6 h-6" /> },
+    { title: "Premium International Products", desc: "We use elite, industry-leading international brands for all our services.", icon: <Globe className="w-6 h-6" /> },
+    { title: "Advanced Detailing Equipment", desc: "State-of-the-art clean rooms, infrared curing lamps, and dust filters.", icon: <Settings className="w-6 h-6" /> },
+    { title: "Genuine 4x4 Accessories", desc: "Sourcing and installing only the most authentic parts for your off-road builds.", icon: <Wrench className="w-6 h-6" /> },
+    { title: "Warranty on Selected Services", desc: "Rest assured with official warranty options on our premium installations.", icon: <ShieldCheck className="w-6 h-6" /> },
+    { title: "Transparent Pricing", desc: "No hidden fees, just upfront pricing tailored to your specific vehicle needs.", icon: <BadgeIndianRupee className="w-6 h-6" /> },
+    { title: "Experienced Installation Team", desc: "Executing each project with microscopic precision and deep expertise.", icon: <Users className="w-6 h-6" /> },
+    { title: "Customer Satisfaction Guaranteed", desc: "We don't just finish the job; we ensure you leave with complete peace of mind.", icon: <ThumbsUp className="w-6 h-6" /> },
+    { title: "High-Quality Finish", desc: "Delivering perfection with a mirror-like finish and flawless wrap tucks.", icon: <Star className="w-6 h-6" /> },
+    { title: "Personalized Vehicle Care", desc: "Every car is unique. We tailor our services to match your exact vision.", icon: <Car className="w-6 h-6" /> }
   ];
 
-  const popularFoods = [
-    { id: 8, name: "Mughlai Chicken Shawarma", price: 160, rating: 4.9, image: "/images/mughlai_shawarma.png", description: "Rich, creamy Mughlai spices infused in juicy chicken shawarma wrap with fries." },
-    { id: 16, name: "Jaffa Chicken Burrito", price: 210, rating: 4.9, image: "/images/spicy_shawarma.png", description: "Jaffa style Mexican burrito loaded with spiced chicken, rice, beans, and fresh salsa." },
-    { id: 13, name: "Chicken Rice Bowl", price: 260, rating: 4.9, image: "/images/chicken_rice_bowl.png", description: "Spiced basmati rice topped with juicy chicken shawarma meat and signature sauce." },
-    { id: 14, name: "Chicken Seekh Kebab Rice Bowl", price: 260, rating: 4.9, image: "/images/chicken_rice_bowl.png", description: "Skewered chicken seekh kebab served over fragrant rice with mint chutney." },
-  ];
+  const heroTitle = settings?.hero_title || "Transform Your Ride Into An Adventure";
+  const heroSubtitle = settings?.hero_subtitle || "Bhopal's ultimate custom shop for Paint Protection Film (PPF), high-end wraps, ceramic shield coatings, and extreme 4x4 builds.";
+  const heroBg = settings?.hero_bg_image || heroVideo;
+  const ctaText = settings?.cta_text || "Book Appointment";
+
+  const aboutTitle = settings?.about_title || "BUILT NOT BOUGHT. WE DEFINE CAR CULTURE.";
+  const aboutSubtitle = settings?.about_subtitle || "THE TAG HERITAGE";
+  const aboutDesc1 = settings?.about_desc_1 || "THE ADVENTURE GARAGE (TAG) is Bhopal’s premium automotive customization studio. Founded on the principle of extreme craftsmanship, we don’t just apply wraps or spray coatings; we customize each vehicle as a personal masterpiece.";
+  const aboutDesc2 = settings?.about_desc_2 || "Whether you want to shield your luxury supercar with self-healing PPF, change colors with premium vinyl, or convert your Mahindra Thar into a menacing 4x4 beast, our certified technicians execute each project with microscopic precision.";
+  const aboutBtnText = settings?.about_button_text || "Read Our Full Story";
+
+  const showAbout = settings?.show_about_section ?? true;
+  const showServices = settings?.show_services_section ?? true;
+  const showGallery = settings?.show_gallery_section ?? true;
+  const showTestimonials = settings?.show_testimonials_section ?? true;
+  const showOffers = settings?.show_offers_section ?? true;
+
+  const customSectionEnabled = settings?.custom_section_enabled || false;
+  const customSectionTitle = settings?.custom_section_title || "";
+  const customSectionSubtitle = settings?.custom_section_subtitle || "";
+  const customSectionContent = settings?.custom_section_content || "";
+  const customSectionImage = settings?.custom_section_image || "";
+  const customSectionCtaText = settings?.custom_section_cta_text || "";
+  const customSectionCtaLink = settings?.custom_section_cta_link || "";
+
+  if (loading) {
+    return (
+      <div className="w-full h-screen bg-black flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full">
-      <Helmet>
-        <title>Jaffa | Premium Food Outlet</title>
-        <meta name="description" content="Experience premium dining and home delivery with Jaffa." />
-      </Helmet>
-
-      {/* Hero Slider */}
-      <section className="relative h-[600px] w-full">
-        <Swiper
-          modules={[Autoplay, EffectFade, Navigation, Pagination]}
-          effect="fade"
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
-          navigation
-          pagination={{ clickable: true }}
-          className="h-full w-full"
-        >
-          {heroSlides.map((slide) => (
-            <SwiperSlide key={slide.id}>
-              <div className="relative h-full w-full">
-                <div className="absolute inset-0 bg-black/50 z-10" />
-                <img 
-                  src={slide.image} 
-                  alt={slide.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 z-20 flex items-center justify-center text-center px-4">
-                  <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="max-w-3xl"
-                  >
-                    <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
-                      {slide.title}
-                    </h1>
-                    <p className="text-lg md:text-xl text-gray-200 mb-8 font-light">
-                      {slide.subtitle}
-                    </p>
-                    <Link
-                      to={slide.buttonLink}
-                      className="inline-block bg-primary-500 text-white font-semibold px-8 py-4 rounded-full text-lg hover:bg-primary-600 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                    >
-                      {slide.buttonText}
-                    </Link>
-                  </motion.div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-gray-50 hover:shadow-md transition-shadow">
-              <div className="bg-primary-100 p-4 rounded-full mb-4 text-primary-500">
-                <Clock className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Fast Delivery</h3>
-              <p className="text-gray-600">Hot and fresh food delivered to your door in under 30 minutes.</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-gray-50 hover:shadow-md transition-shadow">
-              <div className="bg-primary-100 p-4 rounded-full mb-4 text-primary-500">
-                <ShieldCheck className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Premium Quality</h3>
-              <p className="text-gray-600">We use only the finest, freshest ingredients sourced locally.</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-gray-50 hover:shadow-md transition-shadow">
-              <div className="bg-primary-100 p-4 rounded-full mb-4 text-primary-500">
-                <MapPin className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Multiple Locations</h3>
-              <p className="text-gray-600">Find a Jaffa outlet near you and enjoy the same great taste everywhere.</p>
-            </div>
-          </div>
+    <div className="w-full bg-black min-h-screen">
+      {/* 1. Hero Section */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        {/* Background Loop Video */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black z-10" />
+          {heroBg.endsWith('.mp4') || heroBg.endsWith('.webm') || heroBg.includes('video') ? (
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="w-full h-full object-cover scale-105"
+            >
+              <source src={heroBg} type="video/mp4" />
+            </video>
+          ) : (
+            <img 
+              src={heroBg} 
+              alt="Hero BG" 
+              className="w-full h-full object-cover scale-105"
+            />
+          )}
         </div>
-      </section>
 
-      {/* Categories */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Explore Our Menu</h2>
-            <div className="w-24 h-1 bg-primary-500 mx-auto rounded-full"></div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {categories.map((cat) => (
-              <Link key={cat.id} to={`/menu?category=${cat.id}`} className="group relative rounded-2xl overflow-hidden aspect-square cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300">
-                <img src={cat.image} alt={cat.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 w-full p-6 text-center">
-                  <h3 className="text-xl font-bold text-white tracking-wide">{cat.name}</h3>
-                </div>
+        {/* Hero Content */}
+        <div className="relative z-20 text-center px-4 max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <span className="text-accent font-extrabold tracking-widest text-xs uppercase block mb-4 border border-accent/20 px-4 py-1.5 rounded-full w-fit mx-auto bg-black/45 backdrop-blur-sm">
+              Premium Automotive Customization
+            </span>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight uppercase leading-none mb-6 whitespace-pre-line">
+              {heroTitle}
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
+              {heroSubtitle}
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-5">
+              <Link 
+                to="/book-appointment" 
+                className="w-full sm:w-auto bg-accent text-black font-extrabold text-base px-8 py-4 rounded-full hover:bg-accent-hover tracking-wider uppercase transition shadow-lg shadow-accent/20 hover:scale-105"
+              >
+                {ctaText}
               </Link>
-            ))}
-          </div>
+              <Link 
+                to="/services" 
+                className="w-full sm:w-auto glass-panel text-white font-extrabold text-base px-8 py-4 rounded-full hover:bg-white/10 tracking-wider uppercase transition flex items-center justify-center"
+              >
+                <span>View Services</span>
+                <ChevronRight className="w-5 h-5 ml-2" />
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
+          <span className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2">Scroll Down</span>
+          <div className="w-[2px] h-10 bg-gradient-to-b from-accent to-transparent animate-bounce" />
         </div>
       </section>
 
-      {/* Popular Dishes */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-12">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Popular Dishes</h2>
-              <div className="w-24 h-1 bg-primary-500 rounded-full"></div>
+      {/* 2. Brand Story / About TAG */}
+      {showAbout && (
+        <section className="py-24 bg-[#0a0a0a] border-y border-white/5 relative">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-accent/5 via-transparent to-transparent opacity-50" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              
+              {/* Story Text */}
+              <div className="space-y-8">
+                <span className="text-accent font-black uppercase text-xs tracking-widest block">{aboutSubtitle}</span>
+                <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight whitespace-pre-line">
+                  {aboutTitle}
+                </h2>
+                <p className="text-gray-400 leading-relaxed">
+                  {aboutDesc1}
+                </p>
+                <p className="text-gray-400 leading-relaxed">
+                  {aboutDesc2}
+                </p>
+                <div>
+                  <Link to="/about" className="text-accent font-extrabold text-sm uppercase tracking-widest hover:underline flex items-center">
+                    <span>{aboutBtnText}</span>
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Statistics Counters */}
+              <div className="grid grid-cols-2 gap-6">
+                <CounterItem value="500+" label="Cars Detailed" />
+                <CounterItem value="1000+" label="Wraps Installed" />
+                <CounterItem value="300+" label="PPF Installations" />
+                <CounterItem value="100+" label="4x4 Builds" />
+              </div>
+
             </div>
-            <Link to="/menu" className="text-primary-600 font-medium hover:text-primary-700 hidden sm:block">View Full Menu &rarr;</Link>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {popularFoods.map((food) => (
-              <div key={food.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                <div className="relative h-48 overflow-hidden">
-                  <img src={food.image} alt={food.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center shadow-sm">
-                    <Star className="w-4 h-4 text-yellow-400 mr-1 fill-yellow-400" />
-                    <span className="text-sm font-bold">{food.rating}</span>
+        </section>
+      )}
+
+      {/* 2b. Custom Dynamic Section */}
+      {customSectionEnabled && (
+        <section className="py-24 bg-black border-b border-white/5 relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className={`grid grid-cols-1 ${customSectionImage ? 'lg:grid-cols-2' : ''} gap-16 items-center`}>
+              
+              {/* Content Text */}
+              <div className="space-y-8">
+                {customSectionSubtitle && (
+                  <span className="text-accent font-black uppercase text-xs tracking-widest block">
+                    {customSectionSubtitle}
+                  </span>
+                )}
+                {customSectionTitle && (
+                  <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight whitespace-pre-line">
+                    {customSectionTitle}
+                  </h2>
+                )}
+                {customSectionContent && (
+                  <p className="text-gray-400 leading-relaxed whitespace-pre-line">
+                    {customSectionContent}
+                  </p>
+                )}
+                {customSectionCtaText && (
+                  <div>
+                    <Link 
+                      to={customSectionCtaLink || "/services"} 
+                      className="inline-block bg-accent text-black font-extrabold text-xs px-8 py-3.5 rounded-full hover:bg-accent-hover tracking-wider uppercase transition shadow-lg shadow-accent/15"
+                    >
+                      {customSectionCtaText}
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Optional Section Image */}
+              {customSectionImage && (
+                <div className="relative rounded-3xl overflow-hidden aspect-[4/3] border border-white/10 group">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10" />
+                  <img 
+                    src={customSectionImage} 
+                    alt={customSectionTitle || "Custom Section"} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                  />
+                </div>
+              )}
+
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 3. Customization Services */}
+      {showServices && (
+        <section className="py-28 bg-black">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <span className="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">OUR SPECIALTIES</span>
+              <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-6">
+                PREMIUM GARAGE SERVICES
+              </h2>
+              <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+                Explore our core custom services. Every service uses state-of-the-art tooling and comes backed with premium warranties.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {services.map((svc, i) => (
+                <div 
+                  key={i} 
+                  className="group relative rounded-3xl overflow-hidden glass-panel border-white/5 flex flex-col hover:border-accent/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/5"
+                >
+                  <div className="h-48 overflow-hidden relative">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#111111] to-transparent z-10" />
+                    <img 
+                      src={svc.img} 
+                      alt={svc.title} 
+                      className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110" 
+                    />
+                    <div className="absolute bottom-4 left-4 z-20 bg-black/60 backdrop-blur-sm p-3 rounded-2xl border border-white/10 text-accent">
+                      {svc.icon}
+                    </div>
+                  </div>
+                  <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-accent transition-colors">{svc.title}</h3>
+                      <p className="text-gray-400 text-xs leading-relaxed">{svc.desc}</p>
+                    </div>
+                    <Link 
+                      to={svc.link} 
+                      className="text-white hover:text-accent font-extrabold text-xs uppercase tracking-widest flex items-center pt-4"
+                    >
+                      <span>Learn More</span>
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Link>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 truncate">{food.name}</h3>
-                  <p className="text-gray-500 text-sm mb-4 line-clamp-2">{food.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-primary-600">₹{food.price}</span>
-                    <button className="bg-gray-900 text-white p-2 rounded-full hover:bg-primary-500 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    </button>
-                  </div>
+              ))}
+            </div>
+            
+            <div className="text-center mt-12">
+              <Link 
+                to="/services" 
+                className="inline-block bg-white/5 border border-white/10 hover:border-accent/30 text-white font-extrabold px-8 py-3.5 rounded-full text-sm uppercase tracking-widest transition-all duration-300 hover:bg-white/10"
+              >
+                Explore All 10+ Services
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 4. Before & After Interactive Slider */}
+      {showGallery && (
+        <section className="py-24 bg-[#0a0a0a] border-y border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <span className="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">THE PROOF</span>
+              <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-6">
+                INTERACTIVE COMPARISON
+              </h2>
+              <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+                Drag the metallic orange slider horizontally to view the before & after results of our multi-stage paint correction detailing.
+              </p>
+            </div>
+
+            <BeforeAfterSlider />
+          </div>
+        </section>
+      )}
+
+      {/* 5. Why Choose TAG */}
+      <section className="py-28 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <span className="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">WHY CHOOSE US</span>
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-6">
+              THE TAG STANDARD OF EXCELLENCE
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {whyChooseUs.map((item, idx) => (
+              <div 
+                key={idx} 
+                className="p-8 rounded-3xl glass-panel border-white/5 hover:border-accent/20 transition-all duration-300 relative overflow-hidden group"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-xl group-hover:bg-accent/15 transition-all duration-500" />
+                <div className="bg-accent/10 border border-accent/20 p-3 rounded-2xl w-fit text-accent mb-6">
+                  {item.icon}
                 </div>
+                <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-gray-400 text-xs leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
-          <div className="mt-8 text-center sm:hidden">
-            <Link to="/menu" className="inline-block bg-primary-50 text-primary-600 font-medium px-6 py-3 rounded-full">View Full Menu</Link>
+        </div>
+      </section>
+
+      {/* 6. Testimonials */}
+      {showTestimonials && (
+        <section className="py-24 bg-[#0a0a0a] border-y border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-20">
+              <span className="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">REVIEWS</span>
+              <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-6">
+                WHAT OUR CLIENTS SAY
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Review 1 */}
+              <div className="p-8 rounded-3xl glass-panel border-white/5 relative">
+                <div className="flex items-center space-x-1 text-accent mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mb-6 italic">
+                  "Brought my brand new Mahindra Thar to TAG for a full 4x4 suspension lift and dynamic LED tail lights. The team did an incredible job, absolutely zero wiring issues, and the ride is super smooth. Easily the best custom garage in Bhopal!"
+                </p>
+                <div>
+                  <h4 className="font-bold text-white">Arjun Sharma</h4>
+                  <p className="text-xs text-accent uppercase font-bold tracking-widest mt-1">Mahindra Thar 4x4 Build</p>
+                </div>
+              </div>
+              {/* Review 2 */}
+              <div className="p-8 rounded-3xl glass-panel border-white/5 relative">
+                <div className="flex items-center space-x-1 text-accent mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mb-6 italic">
+                  "Exceptional Paint Protection Film (PPF) installation on my Mercedes C-Class. Edges are completely tucked and invisible. The self-healing works like magic under warm water. Very professional behavior and luxury service."
+                </p>
+                <div>
+                  <h4 className="font-bold text-white">Priyanka Verma</h4>
+                  <p className="text-xs text-accent uppercase font-bold tracking-widest mt-1">Mercedes C-Class PPF</p>
+                </div>
+              </div>
+              {/* Review 3 */}
+              <div className="p-8 rounded-3xl glass-panel border-white/5 relative">
+                <div className="flex items-center space-x-1 text-accent mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mb-6 italic">
+                  "Opted for a satin black full vinyl wrap for my Fortuner and Ceramic Coating on top. TAG transformed it completely. It looks like a stealth bomber! Highly recommended studio for luxury car wraps in MP."
+                </p>
+                <div>
+                  <h4 className="font-bold text-white">Kabir Mehta</h4>
+                  <p className="text-xs text-accent uppercase font-bold tracking-widest mt-1">Fortuner Satin Wrap</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 7. Brands We Work With Slider */}
+      <section className="py-16 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <span className="text-xs uppercase tracking-widest text-gray-500 font-bold block">ELITE BRANDS IN OUR PORTFOLIO</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-12 opacity-40 hover:opacity-75 transition-opacity duration-300">
+            <span className="text-white font-extrabold text-2xl tracking-widest uppercase">TOYOTA</span>
+            <span className="text-white font-extrabold text-2xl tracking-widest uppercase">MAHINDRA</span>
+            <span className="text-white font-extrabold text-2xl tracking-widest uppercase">JEEP</span>
+            <span className="text-white font-extrabold text-2xl tracking-widest uppercase">FORD</span>
+            <span className="text-white font-extrabold text-2xl tracking-widest uppercase">MERCEDES</span>
+            <span className="text-white font-extrabold text-2xl tracking-widest uppercase">BMW</span>
+            <span className="text-white font-extrabold text-2xl tracking-widest uppercase">TATA</span>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative py-20 bg-secondary">
-        <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/food.png')]"></div>
-        <div className="relative max-w-4xl mx-auto px-4 text-center z-10">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Hungry? We're open!</h2>
-          <p className="text-xl text-gray-300 mb-10">Book a table for a premium dining experience or order online for fast home delivery.</p>
-          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <Link to="/reservation" className="bg-primary-500 text-white font-bold text-lg px-8 py-4 rounded-full hover:bg-primary-600 transition shadow-lg hover:shadow-primary-500/30">
-              Book a Table
-            </Link>
-            <Link to="/menu" className="bg-white text-secondary font-bold text-lg px-8 py-4 rounded-full hover:bg-gray-100 transition shadow-lg">
-              Order Delivery
-            </Link>
+      {/* 8. FAQ Accordion */}
+      <section className="py-24 bg-[#0a0a0a] border-t border-white/5">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <span className="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">FAQ</span>
+            <h2 className="text-3xl font-black text-white uppercase tracking-tight">
+              FREQUENTLY ASKED QUESTIONS
+            </h2>
+          </div>
+
+          <div className="glass-panel border-white/5 rounded-3xl p-8 space-y-2">
+            <FAQItem 
+              question="What is the difference between PPF and Ceramic Coating?" 
+              answer="Paint Protection Film (PPF) is a thick polyurethane barrier that physically absorbs rock chips, gravel, and scratches. Ceramic Coating is a silica-based liquid glass layer that chemically bonds to paint, providing extreme gloss, hydrophobic wash properties, and UV protection, but does not prevent heavy rock chips." 
+            />
+            <FAQItem 
+              question="Will wrapping my car damage its factory paint?" 
+              answer="No. As long as your vehicle has original OEM factory paint, high-quality wraps from Avery or 3M will protect your paint and can be removed safely without leaving residues or peeling clear coat." 
+            />
+            <FAQItem 
+              question="How long does a detailing or PPF treatment take?" 
+              answer="A standard full detailing takes 1-2 days. Full body PPF or wrapping takes 3-4 days to allow proper surface preparation, detailing, film installation, and edge setting." 
+            />
+            <FAQItem 
+              question="Is 4x4 modification legal under RTO rules?" 
+              answer="Suspension upgrades and external utility parts (bumper guards, winches, snorkels) are widely accepted for off-road operations. Direct modifications to chassis frames or vehicle dimensions are subject to RTO guidelines; we always advise clients on standard-compliant modifications." 
+            />
           </div>
         </div>
       </section>
 
+      {/* 9. Booking CTA banner */}
+      {showOffers && (
+        <section className="py-24 bg-gradient-to-r from-black via-accent/25 to-black relative">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-6">READY TO REIMAGINE YOUR VEHICLE?</h2>
+            <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto">Book a slot today for a detailing consultation or off-road custom build design at our Kohefiza studio.</p>
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+              <Link to="/book-appointment" className="bg-accent text-black font-extrabold text-lg px-10 py-4 rounded-full hover:bg-accent-hover tracking-wider uppercase transition shadow-lg shadow-accent/20">
+                Book Appointment
+              </Link>
+              <a href="tel:09560815118" className="bg-white/5 border border-white/20 text-white font-extrabold text-lg px-10 py-4 rounded-full hover:bg-white/10 tracking-wider uppercase transition flex items-center justify-center">
+                <Phone className="w-5 h-5 mr-3 text-accent" />
+                <span>Call Studio</span>
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

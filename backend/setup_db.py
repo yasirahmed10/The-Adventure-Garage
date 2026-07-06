@@ -7,20 +7,20 @@ def setup():
         cur = conn.cursor()
         
         # Check if role exists
-        cur.execute("SELECT 1 FROM pg_roles WHERE rolname = 'jaffa_user'")
+        cur.execute("SELECT 1 FROM pg_roles WHERE rolname = 'tag_user'")
         if not cur.fetchone():
-            cur.execute("CREATE ROLE jaffa_user WITH LOGIN SUPERUSER PASSWORD 'jaffa_pass'")
-            print("Role jaffa_user created.")
+            cur.execute("CREATE ROLE tag_user WITH LOGIN SUPERUSER PASSWORD 'tag_pass'")
+            print("Role tag_user created.")
         else:
-            print("Role jaffa_user already exists.")
+            print("Role tag_user already exists.")
             
         # Check if database exists
-        cur.execute("SELECT 1 FROM pg_database WHERE datname = 'jaffa_db'")
+        cur.execute("SELECT 1 FROM pg_database WHERE datname = 'tag_db'")
         if not cur.fetchone():
-            cur.execute("CREATE DATABASE jaffa_db OWNER jaffa_user")
-            print("Database jaffa_db created.")
+            cur.execute("CREATE DATABASE tag_db OWNER tag_user")
+            print("Database tag_db created.")
         else:
-            print("Database jaffa_db already exists.")
+            print("Database tag_db already exists.")
             
         cur.close()
         conn.close()

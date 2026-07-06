@@ -4,9 +4,8 @@ from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
 
 from backend.database.db import get_db
-from backend.models.order import Order, OrderStatus
-from backend.models.reservation import Reservation, ReservationStatus
-from backend.models.food import Food
+from backend.models.booking import Booking, BookingStatus
+from backend.models.service import Service
 from backend.models.user import User
 from backend.auth.jwt import get_current_admin
 
@@ -19,59 +18,48 @@ def get_dashboard_stats(db: Session = Depends(get_db), admin=Depends(get_current
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-    # Total Orders
-    total_orders = db.query(Order).count()
+    # Bookings Stats
+    total_bookings = db.query(Booking).count()
+    pending_bookings = db.query(Booking).filter(Booking.status == BookingStatus.pending).count()
+    accepted_bookings = db.query(Booking).filter(Booking.status == BookingStatus.accepted).count()
+    completed_bookings = db.query(Booking).filter(Booking.status == BookingStatus.completed).count()
     
-    # Today's Orders
-    today_orders = db.query(Order).filter(Order.created_at >= today_start).count()
+    # New bookings today
+    today_bookings = db.query(Booking).filter(Booking.created_at >= today_start).count()
     
-    # Revenue (Month)
-    monthly_revenue = db.query(func.sum(Order.total_amount)).filter(
-        Order.created_at >= month_start,
-        Order.status == OrderStatus.delivered
-    ).scalar() or 0.0
-
-    # Total Revenue
-    total_revenue = db.query(func.sum(Order.total_amount)).filter(
-        Order.status == OrderStatus.delivered
-    ).scalar() or 0.0
-
-    # Active Reservations today
-    today_reservations = db.query(Reservation).filter(
-        Reservation.date == today_start.date(),
-        Reservation.status.in_([ReservationStatus.pending, ReservationStatus.approved])
-    ).count()
-
     # Total Users
-    total_users = db.query(User).filter(User.role == "customer").count()
+    total_users = db.query(User).count()
+    
+    # Total Services
+    total_services = db.query(Service).filter(Service.is_active == True).count()
 
-    # Chart Data: Last 7 days revenue
+    # Chart Data: Bookings count for last 7 days
     last_7_days = [(today_start - timedelta(days=i)) for i in range(6, -1, -1)]
-    revenue_chart = []
+    bookings_chart = []
     
     for day in last_7_days:
         next_day = day + timedelta(days=1)
-        day_rev = db.query(func.sum(Order.total_amount)).filter(
-            Order.created_at >= day,
-            Order.created_at < next_day,
-            Order.status == OrderStatus.delivered
-        ).scalar() or 0.0
+        day_count = db.query(Booking).filter(
+            Booking.created_at >= day,
+            Booking.created_at < next_day
+        ).count()
         
-        revenue_chart.append({
+        bookings_chart.append({
             "date": day.strftime("%b %d"),
-            "revenue": float(day_rev)
+            "bookings": day_count
         })
 
     return {
         "stats": {
-            "total_orders": total_orders,
-            "today_orders": today_orders,
-            "monthly_revenue": float(monthly_revenue),
-            "total_revenue": float(total_revenue),
-            "today_reservations": today_reservations,
-            "total_users": total_users
+            "total_bookings": total_bookings,
+            "pending_bookings": pending_bookings,
+            "accepted_bookings": accepted_bookings,
+            "completed_bookings": completed_bookings,
+            "today_bookings": today_bookings,
+            "total_users": total_users,
+            "total_services": total_services
         },
         "charts": {
-            "revenue_last_7_days": revenue_chart
+            "bookings_last_7_days": bookings_chart
         }
     }

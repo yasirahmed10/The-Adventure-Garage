@@ -26,7 +26,6 @@ async def upload_media(
     db: Session = Depends(get_db),
     admin=Depends(get_current_admin)
 ):
-    # Map mime type to logical folder if needed, or use the provided one
     if file.content_type.startswith("image/"):
         target_folder = f"images/{folder}"
     elif file.content_type.startswith("video/"):
@@ -41,9 +40,42 @@ async def upload_media(
         original_name=file.filename,
         file_url=file_url,
         file_type=file.content_type,
-        file_size=0,  # Could be passed back from save_upload_file
+        file_size=0,
         folder=folder,
         uploaded_by=admin.id
+    )
+    db.add(new_media)
+    db.commit()
+    db.refresh(new_media)
+    
+    return new_media
+
+
+@router.post("/public-upload", response_model=MediaFileResponse)
+async def public_upload_media(
+    file: UploadFile = File(...),
+    folder: str = Form("bookings"),
+    db: Session = Depends(get_db)
+):
+    """Allows unauthenticated image uploads specifically for vehicle bookings."""
+    # Restrict to images only for security
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=400,
+            detail="Only image files are allowed for booking uploads."
+        )
+        
+    target_folder = f"images/{folder}"
+    file_url = await save_upload_file(file, target_folder)
+    
+    new_media = MediaFile(
+        filename=file_url.split("/")[-1],
+        original_name=file.filename,
+        file_url=file_url,
+        file_type=file.content_type,
+        file_size=0,
+        folder=folder,
+        uploaded_by=None  # Public upload
     )
     db.add(new_media)
     db.commit()
@@ -58,8 +90,14 @@ def delete_media(media_id: int, db: Session = Depends(get_db), admin=Depends(get
     if not media:
         raise HTTPException(status_code=404, detail="Media not found")
         
-    # Ideally delete file from disk here too
-    
+    # Attempt to delete file from disk
+    try:
+        relative_path = media.file_url.lstrip('/')
+        if os.path.exists(relative_path):
+            os.remove(relative_path)
+    except Exception:
+        pass
+        
     db.delete(media)
     db.commit()
     return {"message": "Media deleted"}

@@ -17,7 +17,7 @@ class Testimonial(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
-    food_id = Column(Integer, ForeignKey("foods.id", ondelete="SET NULL"), nullable=True)
+    service_id = Column(Integer, ForeignKey("services.id", ondelete="SET NULL"), nullable=True)
 
     reviewer_name = Column(String(100), nullable=False)
     reviewer_email = Column(String(255), nullable=True)
@@ -26,12 +26,12 @@ class Testimonial(Base):
     review = Column(Text, nullable=True)
     reply = Column(Text, nullable=True)            # admin reply
 
-    status = Column(SAEnum(TestimonialStatus), default=TestimonialStatus.pending)
-    is_featured = Column(Boolean, default=False)
+    status = Column(SAEnum(TestimonialStatus), default=TestimonialStatus.approved) # Approve by default for quick setup
+    is_featured = Column(Boolean, default=True)
 
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),
                         onupdate=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", backref="testimonials")
-    food = relationship("Food", back_populates="reviews")
+    service = relationship("Service", backref="reviews")

@@ -4,8 +4,8 @@ from typing import List
 from datetime import datetime, timezone
 
 from backend.database.db import get_db
-from backend.models.offer import Offer, Coupon
-from backend.schemas.offer import OfferCreate, OfferUpdate, OfferResponse, CouponCreate, CouponUpdate, CouponResponse
+from backend.models.offer import Offer
+from backend.schemas.offer import OfferCreate, OfferUpdate, OfferResponse
 from backend.auth.jwt import get_current_admin
 
 router = APIRouter(prefix="/offers", tags=["Offers"])

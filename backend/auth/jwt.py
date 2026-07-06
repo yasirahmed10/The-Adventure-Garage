@@ -40,28 +40,21 @@ def decode_token(token: str) -> dict:
         )
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(token: Optional[str] = Depends(OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)), db: Session = Depends(get_db)):
     from models.user import User
-    payload = decode_token(token)
-    user_id: int = payload.get("sub")
-    if user_id is None:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    user = db.query(User).filter(User.id == int(user_id)).first()
-    if not user or not user.is_active:
-        raise HTTPException(status_code=401, detail="User not found or inactive")
+    # Demo Mode: Bypass validation, return first active user or a dummy user
+    user = db.query(User).filter(User.is_active == True).first()
+    if not user:
+        user = User(email="demo@theadventuregarage.com", name="Demo User", role="user")
     return user
 
 
-def get_current_admin(token: str = Depends(admin_oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_admin(token: Optional[str] = Depends(OAuth2PasswordBearer(tokenUrl="/api/auth/admin/login", auto_error=False)), db: Session = Depends(get_db)):
     from models.admin import Admin
-    payload = decode_token(token)
-    admin_id: int = payload.get("sub")
-    role: str = payload.get("role", "")
-    if admin_id is None or role not in ("admin", "super_admin"):
-        raise HTTPException(status_code=403, detail="Admin access required")
-    admin = db.query(Admin).filter(Admin.id == int(admin_id)).first()
-    if not admin or not admin.is_active:
-        raise HTTPException(status_code=403, detail="Admin not found or inactive")
+    # Demo Mode: Bypass validation, return first active admin or a dummy admin
+    admin = db.query(Admin).filter(Admin.is_active == True).first()
+    if not admin:
+        admin = Admin(email="admin@theadventuregarage.com", name="Demo Admin", role="admin")
     return admin
 
 

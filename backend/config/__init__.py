@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # App
-    APP_NAME: str = "Jaffa Restaurant"
+    APP_NAME: str = "THE ADVENTURE GARAGE"
     APP_ENV: str = "development"
     DEBUG: bool = True
 
@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # Database
-    DATABASE_URL: str = "postgresql://jaffa_user:jaffa_pass@localhost:5432/jaffa_db"
+    DATABASE_URL: str = "postgresql://tag_user:tag_pass@localhost:5432/tag_db"
 
     # CORS
     CORS_ORIGINS: str = '["http://localhost:3000","http://localhost:5173"]'
@@ -39,20 +39,20 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    EMAIL_FROM: str = "noreply@jaffa.com"
+    EMAIL_FROM: str = "noreply@theadventuregarage.com"
 
     # Admin
-    ADMIN_EMAIL: str = "admin@jaffa.com"
+    ADMIN_EMAIL: str = "admin@theadventuregarage.com"
     ADMIN_PASSWORD: str = "Admin@123"
-    ADMIN_NAME: str = "Jaffa Admin"
+    ADMIN_NAME: str = "TAG Admin"
 
     # Rate Limiting
     RATE_LIMIT: str = "100/minute"
 
-    # Restaurant
-    RESTAURANT_NAME: str = "Jaffa"
-    RESTAURANT_PHONE: str = "+91-9000000000"
-    RESTAURANT_EMAIL: str = "hello@jaffa.com"
+    # Garage Compatibility Fields
+    RESTAURANT_NAME: str = "THE ADVENTURE GARAGE"
+    RESTAURANT_PHONE: str = "+91-9560815118"
+    RESTAURANT_EMAIL: str = "info@theadventuregarage.com"
 
 
 settings = Settings()

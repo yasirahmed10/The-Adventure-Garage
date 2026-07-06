@@ -19,7 +19,7 @@ class Gallery(Base):
     media_type = Column(SAEnum(MediaType), default=MediaType.image)
     file_url = Column(String(500), nullable=False)
     thumbnail_url = Column(String(500), nullable=True)
-    album = Column(String(100), nullable=True, index=True)
+    category = Column(String(100), nullable=True, index=True) # Cars, SUV, 4x4, PPF, Wrap, Ceramic, Thar
     is_featured = Column(Boolean, default=False)
     display_order = Column(Integer, default=0)
     is_active = Column(Boolean, default=True)
@@ -36,7 +36,7 @@ class MediaFile(Base):
     original_name = Column(String(255), nullable=False)
     file_url = Column(String(500), nullable=False)
     file_type = Column(String(50), nullable=False)   # image/jpeg, video/mp4 etc.
-    file_size = Column(Integer, nullable=False)      # bytes
+    file_size = Column(Integer, nullable=False, default=0)      # bytes
     folder = Column(String(100), nullable=True)
     width = Column(Integer, nullable=True)
     height = Column(Integer, nullable=True)

@@ -3,15 +3,14 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 
-# ── Offer ───────────────────────────────────────────────────────────────────
 class OfferCreate(BaseModel):
     title: str
     description: Optional[str] = None
     offer_type: str = "seasonal"
     discount_type: str = "percentage"
     discount_value: float
-    min_order_amount: float = 0.0
-    applicable_food_ids: Optional[List[int]] = None
+    min_amount: float = 0.0
+    applicable_service_ids: Optional[List[int]] = None
     valid_from: Optional[datetime] = None
     valid_until: Optional[datetime] = None
     is_active: bool = True
@@ -24,8 +23,8 @@ class OfferUpdate(BaseModel):
     offer_type: Optional[str] = None
     discount_type: Optional[str] = None
     discount_value: Optional[float] = None
-    min_order_amount: Optional[float] = None
-    applicable_food_ids: Optional[List[int]] = None
+    min_amount: Optional[float] = None
+    applicable_service_ids: Optional[List[int]] = None
     valid_from: Optional[datetime] = None
     valid_until: Optional[datetime] = None
     is_active: Optional[bool] = None
@@ -40,57 +39,12 @@ class OfferResponse(BaseModel):
     discount_type: str
     discount_value: float
     banner_image: Optional[str]
-    min_order_amount: float
-    applicable_food_ids: Optional[List[int]]
+    min_amount: float
+    applicable_service_ids: Optional[List[int]]
     valid_from: Optional[datetime]
     valid_until: Optional[datetime]
     is_active: bool
     priority: int
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-# ── Coupon ──────────────────────────────────────────────────────────────────
-class CouponCreate(BaseModel):
-    code: str
-    description: Optional[str] = None
-    discount_type: str = "percentage"
-    discount_value: float
-    min_order_amount: float = 0.0
-    max_discount: Optional[float] = None
-    usage_limit: Optional[int] = None
-    is_active: bool = True
-    valid_from: Optional[datetime] = None
-    valid_until: Optional[datetime] = None
-
-
-class CouponUpdate(BaseModel):
-    description: Optional[str] = None
-    discount_type: Optional[str] = None
-    discount_value: Optional[float] = None
-    min_order_amount: Optional[float] = None
-    max_discount: Optional[float] = None
-    usage_limit: Optional[int] = None
-    is_active: Optional[bool] = None
-    valid_from: Optional[datetime] = None
-    valid_until: Optional[datetime] = None
-
-
-class CouponResponse(BaseModel):
-    id: int
-    code: str
-    description: Optional[str]
-    discount_type: str
-    discount_value: float
-    min_order_amount: float
-    max_discount: Optional[float]
-    usage_limit: Optional[int]
-    used_count: int
-    is_active: bool
-    valid_from: Optional[datetime]
-    valid_until: Optional[datetime]
     created_at: datetime
 
     class Config:

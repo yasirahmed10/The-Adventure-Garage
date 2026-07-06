@@ -4,23 +4,16 @@ import api from '../services/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({
+    id: 1,
+    name: "Demo Admin",
+    email: "admin@theadventuregarage.com",
+    role: "admin"
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const res = await api.get('/auth/me'); // We would need a /me endpoint if it existed, we'll use /users/me
-          setUser(res.data);
-        } catch (error) {
-          localStorage.removeItem('token');
-        }
-      }
-      setLoading(false);
-    };
-    checkAuth();
+    // Auth checks disabled for demo mode
   }, []);
 
   const login = async (email, password, isAdmin = false) => {

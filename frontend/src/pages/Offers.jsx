@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Tag, Clock, Copy, Check, Gift } from 'lucide-react';
+import { Tag, Clock, Check, Gift, ArrowRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
+import api from '../services/api';
 
 const Offers = () => {
-  const [copiedCode, setCopiedCode] = useState(null);
-  const [timeLeft, setTimeLeft] = useState({ hours: 8, minutes: 42, seconds: 15 });
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 22, seconds: 0 });
 
   // Countdown timer effect
   useEffect(() => {
@@ -17,8 +20,7 @@ const Offers = () => {
         } else if (prev.hours > 0) {
           return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
         } else {
-          // Reset timer to 12 hours once reached zero
-          return { hours: 11, minutes: 59, seconds: 59 };
+          return { hours: 23, minutes: 59, seconds: 59 };
         }
       });
     }, 1000);
@@ -26,96 +28,111 @@ const Offers = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleCopyCode = (code) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
-  };
-
-  const offers = [
+  const defaultOffers = [
     {
       id: 1,
-      title: "First Order Special",
-      description: "Get flat 50% off on your very first order at Jaffa Shawarma.",
-      code: "JAFFA50",
-      type: "discount",
-      badge: "NEW USER"
+      title: "Monsoon Detailing Shield",
+      description: "Get flat 15% off on our certified dual-layer 9H Ceramic Coating packages. Drive with permanent rain and mud repellency.",
+      discount_value: 15,
+      discount_type: "percentage",
+      min_amount: 15000,
+      offer_type: "seasonal",
+      banner_image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop"
     },
     {
       id: 2,
-      title: "Free Delivery Deal",
-      description: "Order above ₹299 and get free home delivery at your doorstep.",
-      code: "FREESHIP",
-      type: "free_delivery",
-      badge: "POPULAR"
+      title: "Satin Stealth Wrap Bundle",
+      description: "Upgrade to a full body Satin Vinyl Wrap and get a free hydrophobic Ceramic Shield topping (worth ₹10,000) for maximum longevity.",
+      discount_value: 10000,
+      discount_type: "flat",
+      min_amount: 45000,
+      offer_type: "package",
+      banner_image: "https://images.unsplash.com/photo-1611245785530-ab08a8a47de4?q=80&w=800&auto=format&fit=crop"
     },
     {
       id: 3,
-      title: "Weekend Feast Combo",
-      description: "Get flat ₹100 off on ordering any 2 Open Platters + 2 Beverages.",
-      code: "WEEKEND100",
-      type: "combo",
-      badge: "WEEKEND ONLY"
+      title: "Thar Off-Road Makeover Combo",
+      description: "Book a suspension lift kit + 33-inch mud tire package and receive a free pair of Dynamic LED Sequential Tail Lights.",
+      discount_value: 6500,
+      discount_type: "flat",
+      min_amount: 35000,
+      offer_type: "package",
+      banner_image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop"
     }
   ];
 
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const res = await api.get('/offers');
+        setOffers(res.data);
+      } catch (err) {
+        console.error("Error fetching offers, loading fallbacks:", err);
+        setOffers(defaultOffers);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOffers();
+  }, []);
+
   return (
-    <div className="bg-[#e6f4ff] min-h-screen py-12">
+    <div className="bg-black min-h-screen py-16 text-gray-300">
       <Helmet>
-        <title>Offers & Coupons | Jaffa Shawarma</title>
-        <meta name="description" content="Check out current promo codes, flat discounts, and deal of the day at Jaffa Shawarma." />
+        <title>Exclusive Detailing & Customization Offers | TAG</title>
+        <meta name="description" content="Check out current promotional bundles, detailing discounts, and package offers at THE ADVENTURE GARAGE." />
       </Helmet>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">Deals & Offers</h1>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-            Enjoy your favorite Shawarmas and Turkish Baklava with these exclusive discount codes.
+        {/* Header */}
+        <div className="text-center mb-16">
+          <span className="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">TAG EXCLUSIVE PACKAGES</span>
+          <h1 className="text-4xl font-black text-white uppercase tracking-tight sm:text-5xl">Deals & Offers</h1>
+          <p className="mt-4 max-w-2xl mx-auto text-sm text-gray-400">
+            Make the most of our limited-time detailing packages and customized build bundles.
           </p>
-          <div className="mt-4 w-24 h-1.5 bg-primary-500 mx-auto rounded-full"></div>
+          <div className="mt-4 w-24 h-1 bg-accent mx-auto rounded-full"></div>
         </div>
 
-        {/* Deal of the Day / Countdown Section */}
-        <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 mb-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-50 rounded-full -mr-16 -mt-16 z-0"></div>
-          <div className="relative z-10 flex-1">
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-700 mb-4 uppercase tracking-wider">
-              <Clock className="w-4 h-4 mr-1 animate-pulse" /> Deal of the Day
+        {/* Deal of the Day / Countdown Banner */}
+        <div className="glass-panel rounded-3xl p-8 md:p-10 border-white/5 mb-16 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
+          <div className="relative z-10 flex-1 space-y-4">
+            <span className="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black bg-accent/10 border border-accent/20 text-accent uppercase tracking-widest">
+              <Clock className="w-4 h-4 mr-1.5 animate-pulse" /> Flash Custom Deal
             </span>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Flat 20% off on all Rice Bowls!</h2>
-            <p className="text-gray-600 mb-6">Satisfy your appetite with our popular spiced Chicken Rice Bowls and Paneer Bowls.</p>
-            <div className="flex flex-wrap gap-4">
-              <button 
-                onClick={() => handleCopyCode("JAFFA20")}
-                className="bg-primary-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-primary-600 transition flex items-center shadow-lg shadow-primary-500/20"
+            <h2 className="text-2xl md:text-3xl font-black text-white uppercase leading-none">FREE 4x4 SNORKEL INSTALLATION</h2>
+            <p className="text-gray-400 text-sm leading-relaxed max-w-lg">
+              Book a full metal heavy-duty front bumper modification today and get a rugged off-road snorkel installed absolutely free.
+            </p>
+            <div className="pt-2">
+              <Link 
+                to="/book-appointment" 
+                className="bg-accent text-black font-extrabold px-6 py-3 rounded-full hover:bg-accent-hover text-xs uppercase tracking-widest inline-flex items-center transition"
               >
-                {copiedCode === "JAFFA20" ? (
-                  <>Copied! <Check className="w-5 h-5 ml-2" /></>
-                ) : (
-                  <>Copy Code: JAFFA20 <Copy className="w-5 h-5 ml-2" /></>
-                )}
-              </button>
+                <span>Book Deal Now</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
             </div>
           </div>
           
-          <div className="relative z-10 bg-gray-900 text-white p-6 md:p-8 rounded-2xl flex flex-col items-center justify-center min-w-[240px]">
-            <span className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-4">Offer Ends In</span>
+          <div className="relative z-10 bg-[#0f0f0f] border border-white/5 p-6 md:p-8 rounded-2xl flex flex-col items-center justify-center min-w-[260px]">
+            <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-4 block">OFFER EXPIRES IN</span>
             <div className="flex gap-4">
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold font-mono bg-white/10 w-14 h-14 flex items-center justify-center rounded-xl">{String(timeLeft.hours).padStart(2, '0')}</span>
-                <span className="text-[10px] text-gray-400 uppercase mt-2">Hours</span>
+                <span className="text-2xl md:text-3xl font-black font-mono bg-white/5 border border-white/5 w-12 h-12 flex items-center justify-center rounded-xl text-white">{String(timeLeft.hours).padStart(2, '0')}</span>
+                <span className="text-[9px] text-gray-500 uppercase mt-2 font-bold tracking-wider">Hrs</span>
               </div>
-              <span className="text-2xl font-bold mt-2">:</span>
+              <span className="text-2xl font-bold mt-1 text-accent">:</span>
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold font-mono bg-white/10 w-14 h-14 flex items-center justify-center rounded-xl">{String(timeLeft.minutes).padStart(2, '0')}</span>
-                <span className="text-[10px] text-gray-400 uppercase mt-2">Minutes</span>
+                <span className="text-2xl md:text-3xl font-black font-mono bg-white/5 border border-white/5 w-12 h-12 flex items-center justify-center rounded-xl text-white">{String(timeLeft.minutes).padStart(2, '0')}</span>
+                <span className="text-[9px] text-gray-500 uppercase mt-2 font-bold tracking-wider">Mins</span>
               </div>
-              <span className="text-2xl font-bold mt-2">:</span>
+              <span className="text-2xl font-bold mt-1 text-accent">:</span>
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold font-mono bg-white/10 w-14 h-14 flex items-center justify-center rounded-xl">{String(timeLeft.seconds).padStart(2, '0')}</span>
-                <span className="text-[10px] text-gray-400 uppercase mt-2">Seconds</span>
+                <span className="text-2xl md:text-3xl font-black font-mono bg-white/5 border border-white/5 w-12 h-12 flex items-center justify-center rounded-xl text-white">{String(timeLeft.seconds).padStart(2, '0')}</span>
+                <span className="text-[9px] text-gray-500 uppercase mt-2 font-bold tracking-wider">Secs</span>
               </div>
             </div>
           </div>
@@ -126,36 +143,42 @@ const Offers = () => {
           {offers.map((offer) => (
             <div 
               key={offer.id}
-              className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 relative flex flex-col justify-between"
+              className="glass-panel rounded-3xl overflow-hidden border-white/5 hover:border-accent/20 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="flex justify-between items-start mb-6">
-                  <span className="px-3 py-1 rounded-md text-[10px] font-bold bg-primary-50 text-primary-600 uppercase tracking-wider border border-primary-100">
-                    {offer.badge}
-                  </span>
-                  <div className="p-2.5 bg-primary-50 rounded-xl text-primary-500">
-                    {offer.type === 'combo' ? <Gift className="w-5 h-5" /> : <Tag className="w-5 h-5" />}
+                <div className="h-44 overflow-hidden relative">
+                  <img 
+                    src={offer.banner_image || "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=600&auto=format&fit=crop"} 
+                    alt={offer.title} 
+                    className="w-full h-full object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111111] to-transparent" />
+                  
+                  <div className="absolute top-4 left-4 bg-accent text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+                    {offer.offer_type === 'package' ? 'Bundle Package' : 'Seasonal discount'}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{offer.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-6">{offer.description}</p>
+
+                <div className="p-6 space-y-3">
+                  <h3 className="text-xl font-extrabold text-white uppercase tracking-wide">{offer.title}</h3>
+                  <p className="text-gray-400 text-xs leading-relaxed">{offer.description}</p>
+                </div>
               </div>
 
-              <div className="border-t border-dashed pt-4 flex items-center justify-between">
+              <div className="p-6 border-t border-white/5 mt-6 flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-gray-400 font-bold uppercase block mb-1">Coupon Code</span>
-                  <span className="text-base font-bold text-gray-900 font-mono">{offer.code}</span>
+                  <span className="text-[10px] text-gray-500 font-bold uppercase block mb-1">Value Discount</span>
+                  <span className="text-lg font-black text-white">
+                    {offer.discount_type === 'percentage' ? `${offer.discount_value}% OFF` : `₹${offer.discount_value.toLocaleString()} OFF`}
+                  </span>
                 </div>
-                <button 
-                  onClick={() => handleCopyCode(offer.code)}
-                  className={`p-2.5 rounded-xl border text-sm font-semibold transition ${
-                    copiedCode === offer.code 
-                      ? 'bg-green-50 border-green-200 text-green-600' 
-                      : 'border-gray-200 hover:bg-gray-50 text-gray-700'
-                  }`}
+                
+                <Link 
+                  to={`/book-appointment?service=${encodeURIComponent(offer.title)}`}
+                  className="bg-white/5 border border-white/10 hover:bg-accent hover:text-black hover:border-accent p-2.5 rounded-full text-white transition-all duration-300"
                 >
-                  {copiedCode === offer.code ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                </button>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
               </div>
             </div>
           ))}

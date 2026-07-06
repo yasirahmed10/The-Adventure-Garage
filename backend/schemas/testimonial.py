@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr
-from .food import FoodResponse
+from .service import ServiceResponse
 
 
 class TestimonialCreate(BaseModel):
-    food_id: Optional[int] = None
+    service_id: Optional[int] = None
     reviewer_name: str
     reviewer_email: Optional[EmailStr] = None
     rating: float
@@ -21,7 +21,7 @@ class TestimonialUpdate(BaseModel):
 class TestimonialResponse(BaseModel):
     id: int
     user_id: Optional[int]
-    food_id: Optional[int]
+    service_id: Optional[int]
     reviewer_name: str
     reviewer_email: Optional[str]
     reviewer_photo: Optional[str]
@@ -32,7 +32,7 @@ class TestimonialResponse(BaseModel):
     is_featured: bool
     created_at: datetime
     updated_at: datetime
-    food: Optional[FoodResponse]
+    service: Optional[ServiceResponse] = None
 
     class Config:
         from_attributes = True
