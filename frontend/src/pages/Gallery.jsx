@@ -23,30 +23,107 @@ const Gallery = () => {
     {
       id: 1,
       category: 'Thar',
-      title: 'Stealth Black Thar 4x4',
-      file_url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop',
-      description: 'Fully customized Mahindra Thar with 33-inch mud tires, steel bumpers, and dual off-road winches.'
+      title: 'Satin Stealth Thar 4x4',
+      file_url: '/images/gallery/stealth_thar.png',
+      description: 'Mahindra Thar fitted with suspension lift, 33-inch mud tires, metal bumpers, dynamic grill, and full matte wrap.'
     },
     {
       id: 2,
-      category: 'Ceramic',
-      title: 'Mercedes Benz E-Class Quartz',
-      file_url: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop',
-      description: 'Showroom gloss restoration featuring dual-layer 9H nano ceramic coat.'
+      category: 'Thar',
+      title: 'Desert Gold Thar Custom',
+      file_url: '/images/gallery/desert_gold_thar.png',
+      description: 'Mahindra Thar modified in satin desert sand gold color, custom bronze off-road wheels, and dynamic snorkel kit.'
     },
     {
       id: 3,
-      category: 'Wrap',
-      title: 'Satin Dark Grey Fortuner',
-      file_url: 'https://images.unsplash.com/photo-1611245785530-ab08a8a47de4?q=80&w=800&auto=format&fit=crop',
-      description: 'Full stealth color change wrap utilizing premium Avery Dennison vinyl.'
+      category: 'Thar',
+      title: 'Thar Offroad Beast',
+      file_url: '/images/services/offroad_modifications.png',
+      description: 'Mahindra Thar off-road build featuring custom tail lights, rugged front bumper, and heavy-duty winch.'
     },
     {
       id: 4,
+      category: 'SUV',
+      title: 'Gloss Emerald Range Rover',
+      file_url: '/images/gallery/emerald_range_rover.png',
+      description: 'Luxury Range Rover Sport in gloss emerald green finished with a dual-layer nano ceramic coating.'
+    },
+    {
+      id: 5,
+      category: 'SUV',
+      title: 'Matte Charcoal Defender',
+      file_url: '/images/gallery/charcoal_defender.png',
+      description: 'Land Rover Defender wrapped in premium satin charcoal grey vinyl with gloss black roof accents.'
+    },
+    {
+      id: 6,
+      category: '4x4',
+      title: 'Monster Jeep Wrangler',
+      file_url: '/images/gallery/monster_wrangler.png',
+      description: 'Heavily modified Jeep Wrangler 4x4 with 4-inch suspension lift, 37-inch rugged mud tires, and orange detailing.'
+    },
+    {
+      id: 7,
+      category: '4x4',
+      title: 'Toyota Hilux Overland Edition',
+      file_url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop',
+      description: 'Toyota Hilux dual-cab pickup truck custom-built for overlanding, complete with roof tent and snorkel.'
+    },
+    {
+      id: 8,
       category: 'PPF',
-      title: 'Audi RS5 Gloss Armor',
+      title: 'Audi RS5 Paint Protection',
+      file_url: '/images/services/ppf.png',
+      description: 'Full body self-healing gloss paint protection film (PPF) application protecting against rock chips.'
+    },
+    {
+      id: 9,
+      category: 'PPF',
+      title: 'Porsche 911 GT3 Satin PPF',
+      file_url: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=800&auto=format&fit=crop',
+      description: 'Custom satin/matte paint protection film (PPF) transformation on a metallic silver Porsche 911 GT3.'
+    },
+    {
+      id: 10,
+      category: 'Wrap',
+      title: 'Nissan GTR Satin Wrap',
+      file_url: '/images/services/custom_wraps.png',
+      description: 'Nissan GTR R35 wrapped in premium Avery Dennison satin black vinyl with gloss carbon fiber accents.'
+    },
+    {
+      id: 11,
+      category: 'Wrap',
+      title: 'Lamborghini Color Shift Wrap',
+      file_url: '/images/services/vehicle_wrapping.png',
+      description: 'Stunning psychedelic color-shifting vinyl wrap applied to a Lamborghini Huracán.'
+    },
+    {
+      id: 12,
+      category: 'Wrap',
+      title: 'Ford Mustang Chrome Blue Wrap',
+      file_url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=800&auto=format&fit=crop',
+      description: 'Ford Mustang custom wrapped in gloss liquid chrome metallic blue with dual black stripes.'
+    },
+    {
+      id: 13,
+      category: 'Ceramic',
+      title: 'Mercedes E-Class Quartz Coating',
+      file_url: '/images/services/ceramic_coating.png',
+      description: 'Multi-stage paint correction and premium 9H quartz dual-layer ceramic coating for mirror-like finish.'
+    },
+    {
+      id: 14,
+      category: 'Ceramic',
+      title: 'BMW M4 Quartz Detail',
       file_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=800&auto=format&fit=crop',
-      description: 'Full body self-healing paint protection film installation.'
+      description: 'BMW M4 treated with deep paint rejuvenation and premium glass ceramic coating for extreme hydrophobicity.'
+    },
+    {
+      id: 15,
+      category: 'Ceramic',
+      title: 'Interior Detailing & Leather Coat',
+      file_url: '/images/services/premium_detailing.png',
+      description: 'Deep steam restoration and premium ceramic leather protection applied to vehicle seats and dashboard.'
     }
   ];
 

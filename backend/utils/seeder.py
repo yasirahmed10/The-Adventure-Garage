@@ -1,26 +1,17 @@
-import sys
-import os
-from datetime import datetime, timezone, date
-
-# Ensure backend package can be imported
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from backend.database.db import Base, SessionLocal, engine
-from backend.models import (
-    Admin, Service, BusinessSettings, WebsiteSettings,
-    Testimonial, Gallery, BeforeAfter, TeamMember
-)
+from sqlalchemy.orm import Session
+from backend.models.user import User
+from backend.models.admin import Admin
+from backend.models.service import Service
+from backend.models.gallery import Gallery
+from backend.models.testimonial import Testimonial
+from backend.models.team import TeamMember
+from backend.models.settings import BusinessSettings, WebsiteSettings
 from backend.auth.hashing import hash_password
 
-def seed_db():
-    print("Recreating database tables...")
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-    db = SessionLocal()
-    try:
-        # 1. Seed Admin
-        print("Seeding Admin account...")
+def seed_database_safe(db: Session):
+    # 1. Seed Admin
+    existing_admin = db.query(Admin).first()
+    if not existing_admin:
         admin = Admin(
             name="TAG Admin Team",
             email="admin@theadventuregarage.com",
@@ -30,8 +21,9 @@ def seed_db():
         )
         db.add(admin)
 
-        # 2. Seed Business Settings
-        print("Seeding Business Settings...")
+    # 2. Seed Business Settings
+    existing_settings = db.query(BusinessSettings).filter(BusinessSettings.id == 1).first()
+    if not existing_settings:
         settings = BusinessSettings(
             id=1,
             name="THE ADVENTURE GARAGE (TAG)",
@@ -56,8 +48,9 @@ def seed_db():
         )
         db.add(settings)
 
-        # 3. Seed Website SEO Settings
-        print("Seeding Website Settings...")
+    # 3. Seed Website Settings
+    existing_web = db.query(WebsiteSettings).filter(WebsiteSettings.id == 1).first()
+    if not existing_web:
         web_settings = WebsiteSettings(
             id=1,
             meta_title="THE ADVENTURE GARAGE | Premium Detailing & 4x4 Customization Bhopal",
@@ -66,8 +59,8 @@ def seed_db():
         )
         db.add(web_settings)
 
-        # 4. Seed Services
-        print("Seeding Garage Services...")
+    # 4. Seed Services
+    if db.query(Service).count() == 0:
         services_data = [
             {
                 "name": "Ceramic Coating",
@@ -190,26 +183,17 @@ def seed_db():
                 ]
             }
         ]
-
-        inserted_services = []
         for s_data in services_data:
-            s = Service(**s_data)
-            db.add(s)
-            inserted_services.append(s)
-        
-        db.commit()
-        for s in inserted_services:
-            db.refresh(s)
+            db.add(Service(**s_data))
 
-        # 5. Seed Testimonials (Reviews)
-        print("Seeding Testimonials...")
+    # 5. Seed Testimonials
+    if db.query(Testimonial).count() == 0:
         testimonials_data = [
             {
                 "reviewer_name": "Arjun Sharma",
                 "reviewer_email": "arjun@gmail.com",
                 "rating": 5.0,
                 "review": "Brought my brand new Mahindra Thar to TAG for a full 4x4 suspension lift and dynamic LED tail lights. The team did an incredible job, absolutely zero wiring issues, and the ride is super smooth. Easily the best custom garage in Bhopal!",
-                "service_id": inserted_services[4].id if len(inserted_services) > 4 else None,
                 "status": "approved",
                 "is_featured": True
             },
@@ -218,7 +202,6 @@ def seed_db():
                 "reviewer_email": "priyanka@gmail.com",
                 "rating": 5.0,
                 "review": "Exceptional Paint Protection Film (PPF) installation on my Mercedes C-Class. Edges are completely tucked and invisible. The self-healing works like magic under warm water. Very professional behavior and luxury service.",
-                "service_id": inserted_services[1].id if len(inserted_services) > 1 else None,
                 "status": "approved",
                 "is_featured": True
             },
@@ -227,39 +210,15 @@ def seed_db():
                 "reviewer_email": "kabir@mehta.com",
                 "rating": 5.0,
                 "review": "Opted for a satin black full vinyl wrap for my Fortuner and Ceramic Coating on top. TAG transformed it completely. It looks like a stealth bomber! Highly recommended studio for luxury car wraps in MP.",
-                "service_id": inserted_services[2].id if len(inserted_services) > 2 else None,
                 "status": "approved",
                 "is_featured": True
             }
         ]
-
         for t_data in testimonials_data:
             db.add(Testimonial(**t_data))
 
-        # 6. Seed Before & After comparison slides
-        print("Seeding Before & After Gallery...")
-        bas_data = [
-            {
-                "title": "Mahindra Thar Detailing",
-                "description": "Full mud restoration, paint decontamination, and premium detailing gloss treatment.",
-                "before_image": "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=800&auto=format&fit=crop", # Mock placeholder
-                "after_image": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop",
-                "category": "Detailing"
-            },
-            {
-                "title": "Jeep Wrangler Matte Wrap",
-                "description": "Converted from original cherry red to a custom stealth satin grey vinyl wrap.",
-                "before_image": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop",
-                "after_image": "https://images.unsplash.com/photo-1611245785530-ab08a8a47de4?q=80&w=800&auto=format&fit=crop",
-                "category": "Wrap"
-            }
-        ]
-
-        for ba_data in bas_data:
-            db.add(BeforeAfter(**ba_data))
-
-        # 7. Seed Gallery (Projects Showcase)
-        print("Seeding Projects Showcase Gallery...")
+    # 6. Seed Gallery Projects
+    if db.query(Gallery).count() == 0:
         gallery_data = [
             {
                 "title": "Satin Stealth Thar 4x4",
@@ -382,12 +341,11 @@ def seed_db():
                 "display_order": 15
             }
         ]
-
         for g_data in gallery_data:
             db.add(Gallery(**g_data))
 
-        # 8. Seed Team Members
-        print("Seeding Team members...")
+    # 7. Seed Team
+    if db.query(TeamMember).count() == 0:
         team_data = [
             {
                 "name": "Vikram Singh",
@@ -407,14 +365,4 @@ def seed_db():
         for t_member in team_data:
             db.add(TeamMember(**t_member))
 
-        db.commit()
-        print("Database seeded successfully with TAG automotive data!")
-
-    except Exception as e:
-        print(f"Error during seeding: {e}")
-        db.rollback()
-    finally:
-        db.close()
-
-if __name__ == '__main__':
-    seed_db()
+    db.commit()
