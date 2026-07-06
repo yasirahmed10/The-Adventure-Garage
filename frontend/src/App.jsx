@@ -11,6 +11,8 @@ import Offers from './pages/Offers';
 import About from './pages/About';
 import Contact from './pages/Contact';
 
+import ScrollToTop from './components/ScrollToTop';
+
 // Admin imports
 import AdminLayout from './layouts/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
@@ -47,6 +49,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               {/* Customer Routes */}
               <Route path="/" element={<CustomerLayout />}>
