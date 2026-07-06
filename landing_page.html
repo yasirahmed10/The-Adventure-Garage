@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Adventure Garage (TAG) — Premium Vehicle Customization & Detailing Studio</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            accent: {
+              DEFAULT: '#00e5a3',
+              hover: '#00c48b',
+              glow: 'rgba(0, 229, 163, 0.25)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Premium dark scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+    
+    .glass-panel {
+      background: rgba(15, 15, 20, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .text-glow {
+      text-shadow: 0 0 10px rgba(0, 229, 163, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-black text-zinc-300 font-sans antialiased selection:bg-accent selection:text-black">
+
+  <!-- 1. Header & Navigation -->
+  <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-black/90 border-b border-white/5 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
+          <span class="text-accent font-black text-xl tracking-tighter">TAG</span>
+        </div>
+        <div>
+          <span class="text-white font-black text-base tracking-wider uppercase block leading-none">The Adventure Garage</span>
+          <span class="text-accent font-bold text-[10px] tracking-widest uppercase block mt-1">TAG STUDIO</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="#" class="text-xs font-black uppercase tracking-wider text-white hover:text-accent transition-colors">Home</a>
+        <a href="#services" class="text-xs font-black uppercase tracking-wider text-zinc-400 hover:text-white transition-colors">Services</a>
+        <a href="#gallery" class="text-xs font-black uppercase tracking-wider text-zinc-400 hover:text-white transition-colors">Gallery</a>
+        <a href="#before-after" class="text-xs font-black uppercase tracking-wider text-zinc-400 hover:text-white transition-colors">Comparisons</a>
+        <a href="#offers" class="text-xs font-black uppercase tracking-wider text-zinc-400 hover:text-white transition-colors">Offers</a>
+        <a href="#testimonials" class="text-xs font-black uppercase tracking-wider text-zinc-400 hover:text-white transition-colors">Reviews</a>
+      </nav>
+
+      <!-- CTA Button -->
+      <div class="hidden sm:flex items-center">
+        <a href="#booking" class="bg-accent text-black font-extrabold px-6 py-2.5 rounded-full hover:bg-accent-hover text-xs uppercase tracking-widest transition-all duration-300 shadow-lg shadow-accent/20 hover:shadow-accent/40">
+          Book Studio
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn" class="md:hidden p-2 text-zinc-400 hover:text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden bg-zinc-950 border-b border-white/5 px-4 pt-2 pb-6 space-y-3">
+      <a href="#" class="block py-2 text-sm font-bold uppercase text-white">Home</a>
+      <a href="#services" class="block py-2 text-sm font-bold uppercase text-zinc-400 hover:text-white">Services</a>
+      <a href="#gallery" class="block py-2 text-sm font-bold uppercase text-zinc-400 hover:text-white">Gallery</a>
+      <a href="#before-after" class="block py-2 text-sm font-bold uppercase text-zinc-400 hover:text-white">Comparisons</a>
+      <a href="#offers" class="block py-2 text-sm font-bold uppercase text-zinc-400 hover:text-white">Offers</a>
+      <a href="#testimonials" class="block py-2 text-sm font-bold uppercase text-zinc-400 hover:text-white">Reviews</a>
+      <a href="#booking" class="block w-full text-center bg-accent text-black font-extrabold py-3 rounded-full text-xs uppercase tracking-widest">Book Studio</a>
+    </div>
+  </header>
+
+  <!-- 2. Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black">
+    <!-- Grid Overlay -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+    
+    <!-- Ambient Light Glows -->
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center py-20">
+      <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-accent/10 border border-accent/20 text-accent uppercase tracking-widest mb-6">
+        Custom Automotive Detailing & Builds
+      </span>
+      
+      <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight leading-[0.9] mb-8">
+        ELITE CUSTOMS <br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-emerald-400 text-glow">STUDIO</span>
+      </h1>
+      
+      <p class="max-w-2xl mx-auto text-zinc-400 text-sm sm:text-base leading-relaxed mb-10">
+        Transform your drive with our bespoke 4x4 customizations, premium vinyl wraps, self-healing PPF wraps, and showroom-finish ceramic coatings engineered in our Bhopal workshop.
+      </p>
+
+      <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+        <a href="#gallery" class="w-full sm:w-auto bg-accent text-black font-extrabold px-8 py-4 rounded-full hover:bg-accent-hover text-xs uppercase tracking-widest transition-all duration-300 shadow-lg shadow-accent/20 hover:shadow-accent/40">
+          View Projects
+        </a>
+        <a href="#services" class="w-full sm:w-auto border border-white/10 hover:border-accent/30 text-white font-extrabold px-8 py-4 rounded-full text-xs uppercase tracking-widest transition-all duration-300 bg-white/5 hover:bg-white/10">
+          Our Services
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Core Services Section -->
+  <section id="services" class="py-28 bg-[#030303] border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-20">
+        <span class="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">WHAT WE DO</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight">STUDIO SERVICES</h2>
+        <div class="mt-4 w-24 h-1 bg-accent mx-auto rounded-full"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Service 1 -->
+        <div class="glass-panel p-8 rounded-3xl hover:border-accent/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-6 group-hover:bg-accent group-hover:text-black transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">Off-Road Modifications</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed mb-6">Expert suspension lift kits, custom metal bumpers, off-road lights, snorkels, and wider wheel arch packages for off-road dominance.</p>
+          <img src="./frontend/public/images/services/offroad_modifications.png" class="w-full h-44 object-cover rounded-2xl border border-white/5 opacity-80 group-hover:opacity-100 transition-opacity" alt="Off-Road Mods">
+        </div>
+
+        <!-- Service 2 -->
+        <div class="glass-panel p-8 rounded-3xl hover:border-accent/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-6 group-hover:bg-accent group-hover:text-black transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">Custom Wraps</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed mb-6">High-end color change wraps from matte black to color-shifting options using premium cast vinyl materials.</p>
+          <img src="./frontend/public/images/services/custom_wraps.png" class="w-full h-44 object-cover rounded-2xl border border-white/5 opacity-80 group-hover:opacity-100 transition-opacity" alt="Custom Wraps">
+        </div>
+
+        <!-- Service 3 -->
+        <div class="glass-panel p-8 rounded-3xl hover:border-accent/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-6 group-hover:bg-accent group-hover:text-black transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">Paint Protection Film (PPF)</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed mb-6">Self-healing TPU gloss/matte PPF to shield original paint from key scratches, stone chips, and weathering elements.</p>
+          <img src="./frontend/public/images/services/ppf.png" class="w-full h-44 object-cover rounded-2xl border border-white/5 opacity-80 group-hover:opacity-100 transition-opacity" alt="PPF Shield">
+        </div>
+
+        <!-- Service 4 -->
+        <div class="glass-panel p-8 rounded-3xl hover:border-accent/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-6 group-hover:bg-accent group-hover:text-black transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 00-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">Ceramic Coating</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed mb-6">Ultra-hydrophobic ceramic glass treatment providing permanent mirror gloss, UV filter shield, and dirt repellency.</p>
+          <img src="./frontend/public/images/services/ceramic_coating.png" class="w-full h-44 object-cover rounded-2xl border border-white/5 opacity-80 group-hover:opacity-100 transition-opacity" alt="Ceramic Coat">
+        </div>
+
+        <!-- Service 5 -->
+        <div class="glass-panel p-8 rounded-3xl hover:border-accent/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-6 group-hover:bg-accent group-hover:text-black transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">OBD Digital Meters</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed mb-6">Custom diagnostic digital clusters, heads-up dashboard displays, and advanced engine monitoring gauges integration.</p>
+          <img src="./frontend/public/images/services/obd_digital_meters.png" class="w-full h-44 object-cover rounded-2xl border border-white/5 opacity-80 group-hover:opacity-100 transition-opacity" alt="OBD Meters">
+        </div>
+
+        <!-- Service 6 -->
+        <div class="glass-panel p-8 rounded-3xl hover:border-accent/20 transition-all duration-300 group">
+          <div class="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-6 group-hover:bg-accent group-hover:text-black transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">Premium Detailing</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed mb-6">Multi-stage paint correction, interior deep steam cleaning, engine bay dressing, and leather conditioning treatments.</p>
+          <img src="./frontend/public/images/services/premium_detailing.png" class="w-full h-44 object-cover rounded-2xl border border-white/5 opacity-80 group-hover:opacity-100 transition-opacity" alt="Detailing">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Before & After Interactive Slider -->
+  <section id="before-after" class="py-24 bg-[#0a0a0a] border-y border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">THE PROOF</span>
+        <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-6">INTERACTIVE COMPARISON</h2>
+        <p class="text-zinc-400 text-sm leading-relaxed max-w-xl mx-auto">
+          Drag the slider horizontally to view the before & after results of our multi-stage paint correction detailing.
+        </p>
+      </div>
+
+      <!-- Before After Slider Container -->
+      <div class="relative w-full max-w-3xl aspect-[16/10] rounded-3xl overflow-hidden shadow-2xl select-none group border border-white/10" id="slider-container">
+        <!-- Before Image -->
+        <div class="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=1200&auto=format&fit=crop" class="w-full h-full object-cover" alt="Before restoration">
+          <div class="absolute bottom-6 left-6 bg-black/70 px-4 py-1.5 rounded-full border border-white/10 text-xs font-black uppercase tracking-wider text-white">Before (Dirty/Swirled)</div>
+        </div>
+        
+        <!-- After Image Overlay (resizable) -->
+        <div class="absolute inset-0 right-0 overflow-hidden" id="after-image-wrapper" style="width: 50%;">
+          <div class="absolute top-0 left-0 w-[calc(100vw*0.8)] md:w-[768px] aspect-[16/10] max-w-none h-full">
+            <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1200&auto=format&fit=crop" class="w-full h-full object-cover" alt="After restoration">
+          </div>
+          <div class="absolute bottom-6 right-6 bg-accent/90 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-black shadow-lg">After (Showroom Gloss)</div>
+        </div>
+
+        <!-- Slider Bar / Handle -->
+        <div class="absolute top-0 bottom-0 w-1 bg-accent cursor-ew-resize flex items-center justify-center" id="slider-handle" style="left: 50%;">
+          <div class="w-10 h-10 rounded-full bg-accent text-black flex items-center justify-center shadow-lg border-4 border-zinc-950 font-black text-xs select-none">
+            <span class="tracking-tighter">&larr;&rarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Interactive Project Gallery -->
+  <section id="gallery" class="py-28 bg-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">STUDIO PORTFOLIO</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight">FEATURED BUILDS</h2>
+        <div class="mt-4 w-24 h-1 bg-accent mx-auto rounded-full"></div>
+      </div>
+
+      <!-- Gallery Filters -->
+      <div class="flex justify-center space-x-2 sm:space-x-4 mb-12 overflow-x-auto pb-4 scrollbar-thin">
+        <button onclick="filterGallery('all')" class="gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-accent text-black shadow-lg shadow-accent/25" data-filter="all">All Builds</button>
+        <button onclick="filterGallery('Thar')" class="gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/5" data-filter="Thar">Mahindra Thar</button>
+        <button onclick="filterGallery('SUV')" class="gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/5" data-filter="SUV">Luxury SUVs</button>
+        <button onclick="filterGallery('4x4')" class="gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/5" data-filter="4x4">Off-Road 4x4</button>
+        <button onclick="filterGallery('PPF')" class="gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/5" data-filter="PPF">Paint Protection (PPF)</button>
+        <button onclick="filterGallery('Wrap')" class="gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/5" data-filter="Wrap">Vinyl Wraps</button>
+        <button onclick="filterGallery('Ceramic')" class="gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/5" data-filter="Ceramic">Ceramic Glass</button>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- JS inserts items here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Lightbox Modal -->
+  <div id="lightbox" class="fixed inset-0 bg-black/95 z-[100] hidden items-center justify-center p-4 transition-all duration-300" onclick="closeLightbox()">
+    <button class="absolute top-6 right-6 text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 p-3 rounded-full transition" onclick="closeLightbox(event)">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="max-w-4xl w-full glass-panel rounded-3xl overflow-hidden border-white/10 shadow-2xl relative" onclick="event.stopPropagation()">
+      <div class="max-h-[60vh] bg-black flex items-center justify-center">
+        <img id="lightbox-img" src="" class="w-full max-h-[60vh] object-contain" alt="">
+      </div>
+      <div class="p-8 bg-zinc-950 border-t border-white/5">
+        <span id="lightbox-cat" class="inline-block px-3 py-1 rounded-full text-[10px] font-black bg-accent/10 text-accent mb-3 uppercase tracking-widest border border-accent/20"></span>
+        <h2 id="lightbox-title" class="text-2xl font-black text-white uppercase mb-2"></h2>
+        <p id="lightbox-desc" class="text-zinc-400 text-sm leading-relaxed"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Deals & Offers Section -->
+  <section id="offers" class="py-24 bg-[#0a0a0a] border-y border-white/5">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">TAG EXCLUSIVE PACKAGES</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight">Deals & Offers</h2>
+        <div class="mt-4 w-24 h-1 bg-accent mx-auto rounded-full"></div>
+      </div>
+
+      <!-- Flash Custom Deal -->
+      <div class="glass-panel rounded-3xl p-8 md:p-10 border-white/5 mb-16 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-2xl">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl"></div>
+        <div class="relative z-10 flex-1 space-y-4">
+          <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black bg-accent/10 border border-accent/20 text-accent uppercase tracking-widest">
+            <svg class="w-4 h-4 mr-1.5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Flash Custom Deal
+          </span>
+          <h3 class="text-2xl md:text-3xl font-black text-white uppercase leading-none">FREE 4x4 SNORKEL INSTALLATION</h3>
+          <p class="text-zinc-400 text-xs leading-relaxed max-w-lg">
+            Book a full metal heavy-duty front bumper modification today and get a rugged off-road snorkel installed absolutely free.
+          </p>
+          <div class="pt-2">
+            <a href="#booking" class="bg-accent text-black font-extrabold px-6 py-3 rounded-full hover:bg-accent-hover text-xs uppercase tracking-widest inline-flex items-center transition shadow-lg shadow-accent/10">
+              Book Deal Now &rarr;
+            </a>
+          </div>
+        </div>
+        
+        <!-- Countdown Widget -->
+        <div class="relative z-10 bg-zinc-950 border border-white/5 p-6 md:p-8 rounded-2xl flex flex-col items-center justify-center min-w-[260px]">
+          <span class="text-[10px] text-zinc-500 font-black uppercase tracking-widest mb-4 block">OFFER EXPIRES IN</span>
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <span id="hours-val" class="text-2xl md:text-3xl font-black font-mono bg-white/5 border border-white/5 w-12 h-12 flex items-center justify-center rounded-xl text-white">14</span>
+              <span class="text-[9px] text-zinc-500 uppercase mt-2 font-bold tracking-wider">Hrs</span>
+            </div>
+            <span class="text-2xl font-bold mt-1 text-accent">:</span>
+            <div class="flex flex-col items-center">
+              <span id="mins-val" class="text-2xl md:text-3xl font-black font-mono bg-white/5 border border-white/5 w-12 h-12 flex items-center justify-center rounded-xl text-white">20</span>
+              <span class="text-[9px] text-zinc-500 uppercase mt-2 font-bold tracking-wider">Mins</span>
+            </div>
+            <span class="text-2xl font-bold mt-1 text-accent">:</span>
+            <div class="flex flex-col items-center">
+              <span id="secs-val" class="text-2xl md:text-3xl font-black font-mono bg-white/5 border border-white/5 w-12 h-12 flex items-center justify-center rounded-xl text-white">28</span>
+              <span class="text-[9px] text-zinc-500 uppercase mt-2 font-bold tracking-wider">Secs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Offers Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="glass-panel rounded-3xl overflow-hidden border-white/5 hover:border-accent/20 transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="h-44 overflow-hidden relative">
+              <img src="./frontend/public/images/services/ceramic_coating.png" alt="Ceramic coating offer" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
+              <div class="absolute top-4 left-4 bg-accent text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Seasonal discount</div>
+            </div>
+            <div class="p-6 space-y-3">
+              <h4 class="text-lg font-extrabold text-white uppercase tracking-wide">Monsoon Detailing Shield</h4>
+              <p class="text-zinc-400 text-xs leading-relaxed">Get flat 15% off on our certified dual-layer 9H Ceramic Coating packages. Drive with permanent rain and mud repellency.</p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-white/5 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-zinc-500 font-bold uppercase block mb-1">Value Discount</span>
+              <span class="text-lg font-black text-white">15% OFF</span>
+            </div>
+            <a href="#booking" class="bg-white/5 border border-white/10 hover:bg-accent hover:text-black hover:border-accent p-2.5 rounded-full text-white transition-all duration-300">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-panel rounded-3xl overflow-hidden border-white/5 hover:border-accent/20 transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="h-44 overflow-hidden relative">
+              <img src="./frontend/public/images/services/custom_wraps.png" alt="Stealth Wrap offer" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
+              <div class="absolute top-4 left-4 bg-accent text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Bundle Package</div>
+            </div>
+            <div class="p-6 space-y-3">
+              <h4 class="text-lg font-extrabold text-white uppercase tracking-wide">Satin Stealth Wrap Bundle</h4>
+              <p class="text-zinc-400 text-xs leading-relaxed">Upgrade to a full body Satin Vinyl Wrap and get a free hydrophobic Ceramic Shield topping (worth ₹10,000) for maximum longevity.</p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-white/5 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-zinc-500 font-bold uppercase block mb-1">Value Discount</span>
+              <span class="text-lg font-black text-white">₹10,000 OFF</span>
+            </div>
+            <a href="#booking" class="bg-white/5 border border-white/10 hover:bg-accent hover:text-black hover:border-accent p-2.5 rounded-full text-white transition-all duration-300">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-panel rounded-3xl overflow-hidden border-white/5 hover:border-accent/20 transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="h-44 overflow-hidden relative">
+              <img src="./frontend/public/images/services/offroad_modifications.png" alt="Thar off-road combo offer" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
+              <div class="absolute top-4 left-4 bg-accent text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Bundle Package</div>
+            </div>
+            <div class="p-6 space-y-3">
+              <h4 class="text-lg font-extrabold text-white uppercase tracking-wide">Thar Off-Road Makeover Combo</h4>
+              <p class="text-zinc-400 text-xs leading-relaxed">Book a suspension lift kit + 33-inch mud tire package and receive a free pair of Dynamic LED Sequential Tail Lights.</p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-white/5 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-zinc-500 font-bold uppercase block mb-1">Value Discount</span>
+              <span class="text-lg font-black text-white">₹6,500 OFF</span>
+            </div>
+            <a href="#booking" class="bg-white/5 border border-white/10 hover:bg-accent hover:text-black hover:border-accent p-2.5 rounded-full text-white transition-all duration-300">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Testimonials Section -->
+  <section id="testimonials" class="py-24 bg-black border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-20">
+        <span class="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">REVIEWS</span>
+        <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight">TESTIMONIALS</h2>
+        <div class="mt-4 w-24 h-1 bg-accent mx-auto rounded-full"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Review 1 -->
+        <div class="glass-panel p-8 rounded-3xl border-white/5 hover:border-accent/10 transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-1 text-accent mb-6">
+              <!-- Star icons -->
+              <span class="text-lg font-bold">★★★★★</span>
+            </div>
+            <p class="text-zinc-300 text-sm leading-relaxed italic mb-6">
+              "The ceramic coating on my BMW is flawless. It looks better than when I bought it from the showroom. Highly professional team at TAG!"
+            </p>
+          </div>
+          <div>
+            <h5 class="text-white font-bold text-base">Rahul S.</h5>
+            <span class="text-[10px] text-zinc-500 uppercase tracking-wider block mt-1">Verified Client</span>
+          </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="glass-panel p-8 rounded-3xl border-white/5 hover:border-accent/10 transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-1 text-accent mb-6">
+              <span class="text-lg font-bold">★★★★★</span>
+            </div>
+            <p class="text-zinc-300 text-sm leading-relaxed italic mb-6">
+              "Exceptional Paint Protection Film (PPF) installation on my Mercedes C-Class. Edges are completely tucked and invisible. The self-healing works like magic under warm water."
+            </p>
+          </div>
+          <div>
+            <h5 class="text-white font-bold text-base">Priyanka Verma</h5>
+            <span class="text-[10px] text-zinc-500 uppercase tracking-wider block mt-1">Verified Client</span>
+          </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="glass-panel p-8 rounded-3xl border-white/5 hover:border-accent/10 transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-1 text-accent mb-6">
+              <span class="text-lg font-bold">★★★★★</span>
+            </div>
+            <p class="text-zinc-300 text-sm leading-relaxed italic mb-6">
+              "Opted for a satin black full vinyl wrap for my Fortuner and Ceramic Coating on top. TAG transformed it completely. It looks like a stealth bomber!"
+            </p>
+          </div>
+          <div>
+            <h5 class="text-white font-bold text-base">Kabir Mehta</h5>
+            <span class="text-[10px] text-zinc-500 uppercase tracking-wider block mt-1">Verified Client</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Contact / Booking Section -->
+  <section id="booking" class="py-24 bg-[#030303]">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <span class="text-accent font-extrabold uppercase text-xs tracking-widest block mb-4">RESERVE WORKSHOP BAY</span>
+        <h2 class="text-4xl font-black text-white uppercase tracking-tight">Book Appointment</h2>
+        <div class="mt-4 w-24 h-1 bg-accent mx-auto rounded-full"></div>
+      </div>
+
+      <div class="glass-panel p-8 md:p-10 rounded-3xl border-white/5 shadow-2xl relative">
+        <form class="space-y-6" onsubmit="event.preventDefault(); alert('Appointment requested successfully!'); this.reset();">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-[10px] font-black uppercase text-zinc-400 tracking-wider mb-2">Your Name</label>
+              <input type="text" required class="w-full bg-zinc-950 border border-white/5 focus:border-accent/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors" placeholder="John Doe">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black uppercase text-zinc-400 tracking-wider mb-2">Phone Number</label>
+              <input type="tel" required class="w-full bg-zinc-950 border border-white/5 focus:border-accent/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors" placeholder="+91 98765 43210">
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-[10px] font-black uppercase text-zinc-400 tracking-wider mb-2">Select Service</label>
+            <select class="w-full bg-zinc-950 border border-white/5 focus:border-accent/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors">
+              <option>Off-Road Modifications (Thar & 4x4)</option>
+              <option>Custom Vinyl Wrapping</option>
+              <option>Paint Protection Film (PPF)</option>
+              <option>Ceramic Coating & detailing</option>
+              <option>Full Exterior & Interior Makeover</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black uppercase text-zinc-400 tracking-wider mb-2">Preferred Date</label>
+            <input type="date" required class="w-full bg-zinc-950 border border-white/5 focus:border-accent/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black uppercase text-zinc-400 tracking-wider mb-2">Additional Custom Requests</label>
+            <textarea rows="3" class="w-full bg-zinc-950 border border-white/5 focus:border-accent/50 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors" placeholder="e.g. lift kit specs, wrap color choice, etc."></textarea>
+          </div>
+
+          <button type="submit" class="w-full bg-accent text-black font-extrabold py-4 rounded-xl hover:bg-accent-hover text-xs uppercase tracking-widest transition-all duration-300 shadow-lg shadow-accent/20">
+            Submit Booking Request
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Footer -->
+  <footer class="bg-black py-16 border-t border-white/5 text-zinc-500 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+            <span class="text-accent font-black text-sm tracking-tighter">TAG</span>
+          </div>
+          <span class="text-white font-black text-sm uppercase tracking-wider">The Adventure Garage</span>
+        </div>
+        <p class="leading-relaxed">Elite customizing and detailing studio. We bring concepts to life with unmatched precision.</p>
+      </div>
+
+      <div>
+        <h5 class="text-white font-bold uppercase tracking-wider mb-4">Location</h5>
+        <p class="leading-relaxed">
+          Plot No. 12, Sector C,<br>
+          Govindpura Industrial Area,<br>
+          Bhopal, Madhya Pradesh - 462023
+        </p>
+      </div>
+
+      <div>
+        <h5 class="text-white font-bold uppercase tracking-wider mb-4">Contact Info</h5>
+        <p class="leading-relaxed space-y-2">
+          <span class="block">Phone: +91 95608 15118</span>
+          <span class="block">Email: info@theadventuregarage.com</span>
+        </p>
+      </div>
+
+      <div>
+        <h5 class="text-white font-bold uppercase tracking-wider mb-4">Studio Hours</h5>
+        <p class="leading-relaxed space-y-1">
+          <span class="block">Mon - Sat: 10:00 AM - 8:30 PM</span>
+          <span class="block">Sunday: Closed</span>
+        </p>
+      </div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>&copy; 2026 The Adventure Garage (TAG). All rights reserved.</p>
+      <div class="flex space-x-6 text-zinc-400">
+        <a href="#" class="hover:text-accent">Privacy Policy</a>
+        <a href="#" class="hover:text-accent">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Mobile menu toggle
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+
+    // Close menu when clicking links
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.classList.add('hidden');
+      });
+    });
+
+    // 1. Before & After Slider Logic
+    const container = document.getElementById('slider-container');
+    const wrapper = document.getElementById('after-image-wrapper');
+    const handle = document.getElementById('slider-handle');
+
+    function updateSlider(x) {
+      const rect = container.getBoundingClientRect();
+      let position = ((x - rect.left) / rect.width) * 100;
+      if (position < 0) position = 0;
+      if (position > 100) position = 100;
+      wrapper.style.width = `${position}%`;
+      handle.style.left = `${position}%`;
+    }
+
+    container.addEventListener('mousemove', (e) => {
+      updateSlider(e.clientX);
+    });
+
+    container.addEventListener('touchmove', (e) => {
+      if (e.touches[0]) {
+        updateSlider(e.touches[0].clientX);
+      }
+    });
+
+    // 2. Countdown Timer
+    let timerTime = { hours: 14, minutes: 20, seconds: 28 };
+    setInterval(() => {
+      if (timerTime.seconds > 0) {
+        timerTime.seconds--;
+      } else if (timerTime.minutes > 0) {
+        timerTime.minutes--;
+        timerTime.seconds = 59;
+      } else if (timerTime.hours > 0) {
+        timerTime.hours--;
+        timerTime.minutes = 59;
+        timerTime.seconds = 59;
+      } else {
+        timerTime = { hours: 23, minutes: 59, seconds: 59 };
+      }
+      document.getElementById('hours-val').innerText = String(timerTime.hours).padStart(2, '0');
+      document.getElementById('mins-val').innerText = String(timerTime.minutes).padStart(2, '0');
+      document.getElementById('secs-val').innerText = String(timerTime.seconds).padStart(2, '0');
+    }, 1000);
+
+    // 3. Project Gallery Data
+    const projects = [
+      { id: 1, category: 'Thar', title: 'Satin Stealth Thar 4x4', file_url: './frontend/public/images/gallery/stealth_thar.png', description: 'Mahindra Thar fitted with suspension lift, 33-inch mud tires, metal bumpers, dynamic grill, and full matte wrap.' },
+      { id: 2, category: 'Thar', title: 'Desert Gold Thar Custom', file_url: './frontend/public/images/gallery/desert_gold_thar.png', description: 'Mahindra Thar modified in satin desert sand gold color, custom bronze off-road wheels, and dynamic snorkel kit.' },
+      { id: 3, category: 'Thar', title: 'Thar Offroad Beast', file_url: './frontend/public/images/services/offroad_modifications.png', description: 'Mahindra Thar off-road build featuring custom tail lights, rugged front bumper, and heavy-duty winch.' },
+      { id: 4, category: 'SUV', title: 'Gloss Emerald Range Rover', file_url: './frontend/public/images/gallery/emerald_range_rover.png', description: 'Luxury Range Rover Sport in gloss emerald green finished with a dual-layer nano ceramic coating.' },
+      { id: 5, category: 'SUV', title: 'Matte Charcoal Defender', file_url: './frontend/public/images/gallery/charcoal_defender.png', description: 'Land Rover Defender wrapped in premium satin charcoal grey vinyl with gloss black roof accents.' },
+      { id: 6, category: '4x4', title: 'Monster Jeep Wrangler', file_url: './frontend/public/images/gallery/monster_wrangler.png', description: 'Heavily modified Jeep Wrangler 4x4 with 4-inch suspension lift, 37-inch rugged mud tires, and orange detailing.' },
+      { id: 7, category: '4x4', title: 'Toyota Hilux Overland Edition', file_url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop', description: 'Toyota Hilux dual-cab pickup truck custom-built for overlanding, complete with roof tent and snorkel.' },
+      { id: 8, category: 'PPF', title: 'Audi RS5 Paint Protection', file_url: './frontend/public/images/services/ppf.png', description: 'Full body self-healing gloss paint protection film (PPF) application protecting against rock chips.' },
+      { id: 9, category: 'PPF', title: 'Porsche 911 GT3 Satin PPF', file_url: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?q=80&w=800&auto=format&fit=crop', description: 'Custom satin/matte paint protection film (PPF) transformation on a metallic silver Porsche 911 GT3.' },
+      { id: 10, category: 'Wrap', title: 'Nissan GTR Satin Wrap', file_url: './frontend/public/images/services/custom_wraps.png', description: 'Nissan GTR R35 wrapped in premium Avery Dennison satin black vinyl with gloss carbon fiber accents.' },
+      { id: 11, category: 'Wrap', title: 'Lamborghini Color Shift Wrap', file_url: './frontend/public/images/services/vehicle_wrapping.png', description: 'Stunning psychedelic color-shifting vinyl wrap applied to a Lamborghini Huracán.' },
+      { id: 12, category: 'Wrap', title: 'Ford Mustang Chrome Blue Wrap', file_url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=800&auto=format&fit=crop', description: 'Ford Mustang custom wrapped in gloss liquid chrome metallic blue with dual black stripes.' },
+      { id: 13, category: 'Ceramic', title: 'Mercedes E-Class Quartz Coating', file_url: './frontend/public/images/services/ceramic_coating.png', description: 'Multi-stage paint correction and premium 9H quartz dual-layer ceramic coating for mirror-like finish.' },
+      { id: 14, category: 'Ceramic', title: 'BMW M4 Quartz Detail', file_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=800&auto=format&fit=crop', description: 'BMW M4 treated with deep paint rejuvenation and premium glass ceramic coating for extreme hydrophobicity.' },
+      { id: 15, category: 'Ceramic', title: 'Interior Detailing & Leather Coat', file_url: './frontend/public/images/services/premium_detailing.png', description: 'Deep steam restoration and premium ceramic leather protection applied to vehicle seats and dashboard.' }
+    ];
+
+    // Initial Gallery Render
+    function renderGallery(items) {
+      const grid = document.getElementById('gallery-grid');
+      grid.innerHTML = '';
+      
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'group glass-panel rounded-3xl overflow-hidden hover:border-accent/30 transition-all duration-500 cursor-pointer flex flex-col h-full';
+        card.onclick = () => openLightbox(item);
+        
+        card.innerHTML = `
+          <div class="relative aspect-[4/3] overflow-hidden bg-white/5">
+            <img src="${item.file_url}" alt="${item.title}" class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105">
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <div class="bg-accent text-black p-3.5 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-5 flex-grow flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] text-accent uppercase font-bold tracking-widest block mb-2">${item.category}</span>
+              <h3 class="font-bold text-white text-base mb-1 group-hover:text-accent transition-colors">${item.title}</h3>
+              <p class="text-zinc-400 text-[11px] leading-relaxed line-clamp-2">${item.description}</p>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    renderGallery(projects);
+
+    // Gallery Filter Logic
+    function filterGallery(category) {
+      // Toggle tab classes
+      document.querySelectorAll('.gallery-tab').forEach(tab => {
+        if (tab.getAttribute('data-filter') === category) {
+          tab.className = 'gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-accent text-black shadow-lg shadow-accent/25';
+        } else {
+          tab.className = 'gallery-tab px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/5';
+        }
+      });
+
+      if (category === 'all') {
+        renderGallery(projects);
+      } else {
+        const filtered = projects.filter(item => item.category === category);
+        renderGallery(filtered);
+      }
+    }
+
+    // 4. Lightbox Modal Logic
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCat = document.getElementById('lightbox-cat');
+    const lightboxTitle = document.getElementById('lightbox-title');
+    const lightboxDesc = document.getElementById('lightbox-desc');
+
+    function openLightbox(item) {
+      lightboxImg.src = item.file_url;
+      lightboxCat.innerText = item.category;
+      lightboxTitle.innerText = item.title;
+      lightboxDesc.innerText = item.description;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+    }
+
+    function closeLightbox(event) {
+      if (event) event.stopPropagation();
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+    }
+  </script>
+</body>
+</html>
