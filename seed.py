@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from backend.database.db import Base, SessionLocal, engine
 from backend.models import (
     Admin, Service, BusinessSettings, WebsiteSettings,
-    Testimonial, Gallery, BeforeAfter, TeamMember
+    Testimonial, Gallery, BeforeAfter, TeamMember, Offer
 )
 from backend.auth.hashing import hash_password
 
@@ -406,6 +406,46 @@ def seed_db():
         ]
         for t_member in team_data:
             db.add(TeamMember(**t_member))
+
+        # 9. Seed Offers
+        print("Seeding Offers...")
+        offers_data = [
+            {
+                "title": "Monsoon Detailing Shield",
+                "description": "Get flat 15% off on our certified dual-layer 9H Ceramic Coating packages. Drive with permanent rain and mud repellency.",
+                "offer_type": "seasonal",
+                "discount_type": "percentage",
+                "discount_value": 15.0,
+                "min_amount": 15000.0,
+                "banner_image": "/images/services/ceramic_coating.png",
+                "is_active": True,
+                "priority": 3
+            },
+            {
+                "title": "Satin Stealth Wrap Bundle",
+                "description": "Upgrade to a full body Satin Vinyl Wrap and get a free hydrophobic Ceramic Shield topping (worth ₹10,000) for maximum longevity.",
+                "offer_type": "package",
+                "discount_type": "flat",
+                "discount_value": 10000.0,
+                "min_amount": 45000.0,
+                "banner_image": "/images/services/custom_wraps.png",
+                "is_active": True,
+                "priority": 2
+            },
+            {
+                "title": "Thar Off-Road Makeover Combo",
+                "description": "Book a suspension lift kit + 33-inch mud tire package and receive a free pair of Dynamic LED Sequential Tail Lights.",
+                "offer_type": "package",
+                "discount_type": "flat",
+                "discount_value": 6500.0,
+                "min_amount": 35000.0,
+                "banner_image": "/images/services/offroad_modifications.png",
+                "is_active": True,
+                "priority": 1
+            }
+        ]
+        for offer_data in offers_data:
+            db.add(Offer(**offer_data))
 
         db.commit()
         print("Database seeded successfully with TAG automotive data!")

@@ -37,7 +37,7 @@ const Offers = () => {
       discount_type: "percentage",
       min_amount: 15000,
       offer_type: "seasonal",
-      banner_image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=800&auto=format&fit=crop"
+      banner_image: "/images/services/ceramic_coating.png"
     },
     {
       id: 2,
@@ -47,7 +47,7 @@ const Offers = () => {
       discount_type: "flat",
       min_amount: 45000,
       offer_type: "package",
-      banner_image: "https://images.unsplash.com/photo-1611245785530-ab08a8a47de4?q=80&w=800&auto=format&fit=crop"
+      banner_image: "/images/services/custom_wraps.png"
     },
     {
       id: 3,
@@ -57,7 +57,7 @@ const Offers = () => {
       discount_type: "flat",
       min_amount: 35000,
       offer_type: "package",
-      banner_image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=800&auto=format&fit=crop"
+      banner_image: "/images/services/offroad_modifications.png"
     }
   ];
 
@@ -65,7 +65,11 @@ const Offers = () => {
     const fetchOffers = async () => {
       try {
         const res = await api.get('/offers');
-        setOffers(res.data);
+        if (res.data && res.data.length > 0) {
+          setOffers(res.data);
+        } else {
+          setOffers(defaultOffers);
+        }
       } catch (err) {
         console.error("Error fetching offers, loading fallbacks:", err);
         setOffers(defaultOffers);
