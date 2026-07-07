@@ -160,6 +160,26 @@ const FAQItem = ({ question, answer }) => {
 const Home = () => {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Hero Section Interactive Showcase Data
+  const heroCars = [
+    { id: 'mustang', name: "Mustang GT", image: "/images/mustang_gt.png", tag: "V8 Custom Wraps" },
+    { id: 'g-class', name: "Mercedes G-Class", image: "/images/mercedes_g_class.png", tag: "Elite Ceramic Protection" },
+    { id: 'range-rover', name: "Range Rover", image: "/images/range_rover.png", tag: "Self-Healing PPF" },
+    { id: 'land-cruiser', name: "Land Cruiser", image: "/images/land_cruiser.png", tag: "Extreme 4x4 Offroad Build" }
+  ];
+  
+  const [activeCarIndex, setActiveCarIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Auto-rotation timer logic
+  useEffect(() => {
+    if (isHovered) return;
+    const timer = setInterval(() => {
+      setActiveCarIndex((prev) => (prev + 1) % heroCars.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [isHovered, heroCars.length]);
 
   useEffect(() => {
     const fetchHomeSettings = async () => {
@@ -310,10 +330,10 @@ const Home = () => {
   return (
     <div className="w-full bg-black min-h-screen">
       {/* 1. Hero Section */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden py-24 lg:py-0">
         {/* Background Loop Video */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-black z-10" />
           {heroBg.endsWith('.mp4') || heroBg.endsWith('.webm') || heroBg.includes('video') ? (
             <video 
               autoPlay 
@@ -333,42 +353,116 @@ const Home = () => {
           )}
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-20 text-center px-4 max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <span className="text-accent font-extrabold tracking-widest text-xs uppercase block mb-4 border border-accent/20 px-4 py-1.5 rounded-full w-fit mx-auto bg-black/45 backdrop-blur-sm">
-              Premium Automotive Customization
-            </span>
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight uppercase leading-none mb-6 whitespace-pre-line">
-              {heroTitle}
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-300 font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
-              {heroSubtitle}
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-5">
-              <Link 
-                to="/book-appointment" 
-                className="w-full sm:w-auto bg-accent text-black font-extrabold text-base px-8 py-4 rounded-full hover:bg-accent-hover tracking-wider uppercase transition shadow-lg shadow-accent/20 hover:scale-105"
+        {/* Hero Content Grid */}
+        <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 lg:py-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
+            {/* Left Column: Heading & Subtitle */}
+            <div className="lg:col-span-7 text-center lg:text-left">
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
               >
-                {ctaText}
-              </Link>
-              <Link 
-                to="/services" 
-                className="w-full sm:w-auto glass-panel text-white font-extrabold text-base px-8 py-4 rounded-full hover:bg-white/10 tracking-wider uppercase transition flex items-center justify-center"
-              >
-                <span>View Services</span>
-                <ChevronRight className="w-5 h-5 ml-2" />
-              </Link>
+                <span className="text-accent font-extrabold tracking-widest text-xs uppercase inline-block mb-6 border border-accent/20 px-4 py-1.5 rounded-full bg-black/45 backdrop-blur-sm">
+                  Premium Automotive Customization
+                </span>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight uppercase leading-none mb-6 whitespace-pre-line">
+                  {heroTitle}
+                </h1>
+                <p className="text-base sm:text-lg md:text-xl text-gray-300 font-medium max-w-2xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+                  {heroSubtitle}
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center lg:justify-start items-center gap-5">
+                  <Link 
+                    to="/book-appointment" 
+                    className="w-full sm:w-auto bg-accent text-black font-extrabold text-base px-8 py-4 rounded-full hover:bg-accent-hover tracking-wider uppercase transition shadow-lg shadow-accent/20 hover:scale-105 text-center font-semibold"
+                  >
+                    {ctaText}
+                  </Link>
+                  <Link 
+                    to="/services" 
+                    className="w-full sm:w-auto glass-panel text-white font-extrabold text-base px-8 py-4 rounded-full hover:bg-white/10 tracking-wider uppercase transition flex items-center justify-center"
+                  >
+                    <span>View Services</span>
+                    <ChevronRight className="w-5 h-5 ml-2" />
+                  </Link>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
+
+            {/* Right Column: Car Showcase */}
+            <div className="lg:col-span-5 w-full flex flex-col items-center justify-center">
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+                className="w-full max-w-md lg:max-w-full"
+              >
+                {/* Car Showcase Container */}
+                <div 
+                  className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden glass-panel border-white/5 shadow-2xl hover:border-accent/30 transition-all duration-500 flex items-center justify-center group"
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  {/* Subtle Background Glow behind the car */}
+                  <div className="absolute -inset-10 bg-accent/5 rounded-full blur-3xl opacity-50 group-hover:bg-accent/10 transition-all duration-500 z-0" />
+                  
+                  {/* Car Image with smooth exit/enter transition */}
+                  <div className="absolute inset-0 z-10 w-full h-full overflow-hidden">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={activeCarIndex}
+                        src={heroCars[activeCarIndex].image}
+                        alt={heroCars[activeCarIndex].name}
+                        initial={{ opacity: 0, scale: 1.05 }}
+                        animate={{ 
+                          opacity: 1, 
+                          scale: 1, 
+                          transition: { 
+                            opacity: { duration: 0.5 },
+                            scale: { duration: 0.5 }
+                          }
+                        }}
+                        exit={{ opacity: 0, scale: 1.05, transition: { duration: 0.4 } }}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      />
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Gradient Overlay on top of the image to ensure high contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10 z-20 pointer-events-none" />
+
+                  {/* Active Spec/Custom Tag */}
+                  <div className="absolute top-4 left-4 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 text-xs font-black tracking-widest text-accent uppercase">
+                    {heroCars[activeCarIndex].tag}
+                  </div>
+                </div>
+
+                {/* Navigation Tabs */}
+                <div className="flex flex-wrap justify-center gap-2 mt-6">
+                  {heroCars.map((car, idx) => (
+                    <button
+                      key={car.id}
+                      onClick={() => setActiveCarIndex(idx)}
+                      className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 border ${
+                        idx === activeCarIndex
+                          ? "bg-accent border-accent text-black shadow-lg shadow-accent/20 scale-105 cursor-pointer"
+                          : "bg-white/5 border-white/5 text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer"
+                      }`}
+                    >
+                      {car.name}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+          </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
           <span className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-2">Scroll Down</span>
           <div className="w-[2px] h-10 bg-gradient-to-b from-accent to-transparent animate-bounce" />
         </div>

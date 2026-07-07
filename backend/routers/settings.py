@@ -8,6 +8,7 @@ from backend.schemas.settings import (BusinessSettingsUpdate, BusinessSettingsRe
                               WebsiteSettingsUpdate, WebsiteSettingsResponse,
                               PageContentCreate, PageContentUpdate, PageContentResponse)
 from backend.auth.jwt import get_current_admin
+from backend.utils.seeder import seed_database_safe
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
 
@@ -119,3 +120,13 @@ def update_page_content(page_key: str, page_update: PageContentUpdate, db: Sessi
     db.commit()
     db.refresh(page)
     return page
+
+
+@router.get("/seed")
+def seed_database_route(db: Session = Depends(get_db)):
+    try:
+        seed_database_safe(db)
+        return {"status": "success", "message": "Database seeded successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
